@@ -1,0 +1,20 @@
+name = "fridge-guestbook"
+main = "src/index.js"
+compatibility_date = "2026-01-01"
+
+# lets the worker import admin.html as a string
+[[rules]]
+type = "Text"
+globs = ["**/*.html"]
+fallthrough = true
+
+[vars]
+# sites allowed to read and sign the guest book
+ALLOWED_ORIGINS = "https://rawaidakhtar.com,https://www.rawaidakhtar.com,http://localhost:8000,http://127.0.0.1:8000"
+# "true" skips the queue and puts every entry on the fridge straight away
+AUTO_APPROVE = "false"
+
+[[kv_namespaces]]
+binding = "GUESTBOOK"
+# paste the id printed by: npx wrangler kv namespace create GUESTBOOK
+id = "REPLACE_WITH_KV_NAMESPACE_ID"

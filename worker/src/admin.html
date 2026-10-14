@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Guest book queue</title>
+<style>
+  :root { --ink: #1c1a35; --cream: #f1ebd9; --tomato: #e5473a; --leaf: #3ba55b; }
+  body { margin: 0; padding: 20px 16px 60px; background: var(--cream); color: var(--ink); font: 16px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 900px; margin: 0 auto; }
+  h1 { margin: 0 0 4px; font-size: 26px; }
+  h2 { margin: 32px 0 12px; font-size: 18px; }
+  p { margin: 0 0 12px; }
+  .muted { color: #5d5872; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+  .entry { background: #fff; border: 3px solid var(--ink); border-radius: 12px; padding: 10px; display: grid; gap: 8px; align-content: start; }
+  .entry img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 6px; background: #d8d3c4; display: block; }
+  .entry .msg { font-weight: 600; overflow-wrap: anywhere; }
+  .entry .who { font-size: 13px; color: #5d5872; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  button, input { font: inherit; }
+  button { cursor: pointer; border: 3px solid var(--ink); border-radius: 10px; padding: 6px 14px; background: var(--cream); color: var(--ink); font-weight: 700; }
+  button.yes { background: var(--leaf); color: #fff; }
+  button.no { background: var(--tomato); color: #fff; }
+  button:disabled { opacity: .5; cursor: default; }
+  input { border: 3px solid var(--ink); border-radius: 10px; padding: 6px 10px; min-width: 0; flex: 1; max-width: 320px; }
+  #status { min-height: 1.4em; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Guest book queue</h1>
+  <p class="muted">Approve an entry to put it on the fridge for everyone. Deny deletes it.</p>
+
+  <form id="login" class="row" hidden>
+    <input id="key" type="password" placeholder="Admin key" autocomplete="current-password" aria-label="Admin key">
+    <button type="submit">Unlock</button>
+  </form>
+  <p id="status" role="status"></p>
+
+  <div id="queue" hidden>
+    <h2>Waiting <span id="nPending" class="muted"></span></h2>
+    <div class="grid" id="pending"></div>
+    <h2>On the fridge <span id="nApproved" class="muted"></span></h2>
+    <div class="grid" id="approved"></div>
+    <p class="row" style="margin-top:32px"><button id="refresh" type="button">Refresh</button><button id="lock" type="button">Lock</button></p>
+  </div>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+let key = sessionStorage.getItem('guestbook.key') || '';
+const status = msg => { $('#status').textContent = msg; };
+
+async function api(path, body) {
+  const r = await fetch(path, {
+    method: body ? 'POST' : 'GET',
+    headers: { Authorization: 'Bearer ' + key, ...(body ? { 'Content-Type': 'application/json' } : {}) },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (r.status === 401) { lock('That key didn\'t work.'); throw new Error('unauthorized'); }
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || 'failed');
+  return r;
+}
+
+function card(e, buttons) {
+  const el = document.createElement('div'); el.className = 'entry';
+  const img = document.createElement('img'); img.alt = '';
+  const msg = document.createElement('div'); msg.className = 'msg'; msg.textContent = e.msg || '(no note)';
+  const who = document.createElement('div'); who.className = 'who';
+  who.textContent = (e.name || 'A guest') + ' · ' + new Date(e.ts).toLocaleString();
+  const row = document.createElement('div'); row.className = 'row';
+  for (const [label, cls, path] of buttons) {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = label; b.className = cls;
+    b.addEventListener('click', async () => {
+      row.querySelectorAll('button').forEach(x => x.disabled = true);
+      try { await api(path, { id: e.id }); await load(); }
+      catch (err) { if (err.message !== 'unauthorized') status('That didn\'t go through: ' + err.message); row.querySelectorAll('button').forEach(x => x.disabled = false); }
+    });
+    row.append(b);
+  }
+  el.append(img, msg, who, row);
+  return { el, img };
+}
+
+async function load() {
+  status('Loading…');
+  let data;
+  try { data = await (await api('/admin/entries')).json(); } catch (err) { if (err.message !== 'unauthorized') status('Couldn\'t load the queue.'); return; }
+  $('#login').hidden = true; $('#queue').hidden = false;
+  $('#nPending').textContent = '(' + data.pending.length + ')'; $('#nApproved').textContent = '(' + data.approved.length + ')';
+  const pending = $('#pending'), approved = $('#approved');
+  pending.textContent = ''; approved.textContent = '';
+  if (!data.pending.length) pending.textContent = 'Nothing waiting.';
+  for (const e of data.pending) {
+    const c = card(e, [['Approve', 'yes', '/admin/approve'], ['Deny', 'no', '/admin/deny']]);
+    pending.append(c.el);
+    api('/admin/img/' + e.id).then(r => r.blob()).then(b => { c.img.src = URL.createObjectURL(b); }).catch(() => {});
+  }
+  for (const e of data.approved) {
+    const c = card(e, [['Remove', 'no', '/admin/remove']]);
+    c.img.src = '/img/' + e.id; c.img.loading = 'lazy';
+    approved.append(c.el);
+  }
+  status('');
+}
+
+function lock(msg) {
+  key = ''; sessionStorage.removeItem('guestbook.key');
+  $('#queue').hidden = true; $('#login').hidden = false; status(msg || '');
+}
+
+$('#login').addEventListener('submit', e => {
+  e.preventDefault();
+  key = $('#key').value; $('#key').value = '';
+  sessionStorage.setItem('guestbook.key', key);
+  load();
+});
+$('#refresh').addEventListener('click', load);
+$('#lock').addEventListener('click', () => lock());
+
+if (key) load(); else $('#login').hidden = false;
+</script>
+</body>
+</html>
