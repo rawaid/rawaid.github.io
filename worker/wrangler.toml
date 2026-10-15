@@ -16,5 +16,5 @@ AUTO_APPROVE = "false"
 
 [[kv_namespaces]]
 binding = "GUESTBOOK"
-# paste the id printed by: npx wrangler kv namespace create GUESTBOOK
-id = "REPLACE_WITH_KV_NAMESPACE_ID"
+# created with: npx wrangler kv namespace create GUESTBOOK
+id = "6d923d04c4824431a09bf3e9ff62c9b2"
