@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Fridge icons</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titan+One&family=Nunito:wght@700&display=swap">
+<style>
+  /* Renders the low-poly portfolio icons used on the fridge. Each one is drawn on a transparent
+     background; right-click an icon to save it, or run window.renderIcons() for data URLs. */
+  :root { --bg: #c9dedc; --ink: #1c1a35; }
+  body { margin: 0; padding: 20px 16px; background: var(--bg); color: var(--ink); font: 700 15px/1.4 Nunito, system-ui, sans-serif; }
+  h1 { margin: 0 0 16px; font: 400 28px "Titan One", system-ui, sans-serif; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  figure { margin: 0; background: rgba(255,255,255,.5); border-radius: 12px; padding: 10px; }
+  figure img { width: 100%; display: block; image-rendering: pixelated; }
+  figcaption { text-align: center; margin-top: 6px; }
+</style>
+</head>
+<body>
+<h1>Fridge icons</h1>
+<div class="grid" id="grid"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const T = THREE;
+const SIZE = 360; // rendered pixel size; antialiasing off for the chunky N64 edge
+
+const lam = (c, o = {}) => new T.MeshLambertMaterial(Object.assign({ color: c }, o));
+function add(parent, geo, m, p = [0, 0, 0], s = [1, 1, 1], r = [0, 0, 0]) {
+  const o = new T.Mesh(geo, m); o.position.set(...p); o.scale.set(...s); o.rotation.set(...r); parent.add(o); return o;
+}
+function canvas(w, h, paint) {
+  const c = document.createElement('canvas'); c.width = w; c.height = h; paint(c.getContext('2d'), w, h);
+  const t = new T.CanvasTexture(c); t.magFilter = T.LinearFilter; return t;
+}
+
+/* ------------------------------------------------------------------ headphones (Perfect Eater Radio)
+   The "Low-poly headphones" model in its Studio colors, without the cable. */
+function headphones() {
+  const band = lam('#2c303c'), cup = lam('#2c303c'), pad = lam('#6a6f7e'), metal = lam('#9aa3b5');
+  const cap = lam(0xffffff, { map: canvas(32, 32, (g) => {
+    g.fillStyle = '#2c303c'; g.fillRect(0, 0, 32, 32);
+    for (const [r, c] of [[11, '#f0b43c'], [7, '#2c303c'], [3, '#f0b43c']]) { g.fillStyle = c; g.beginPath(); g.arc(16, 16, r, 0, 7); g.fill(); }
+  }) });
+  const root = new T.Group(), model = new T.Group(); root.add(model);
+  add(model, new T.TorusGeometry(1.12, 0.09, 4, 10, Math.PI), band, [0, 0.05, 0]);
+  add(model, new T.TorusGeometry(1.02, 0.07, 4, 7, Math.PI * 0.62), pad, [0, 0.05, 0], [1, 1, 1], [0, 0, Math.PI * 0.19]);
+  [-1, 1].forEach(sd => {
+    add(model, new T.BoxGeometry(0.16, 0.22, 0.2), band, [sd * 1.12, -0.02, 0]);
+    add(model, new T.BoxGeometry(0.06, 0.34, 0.1), metal, [sd * 1.12, -0.26, 0]);
+    add(model, new T.CylinderGeometry(0.46, 0.46, 0.3, 8), cup, [sd * 1.06, -0.78, 0], [1, 1, 1], [0, 0, Math.PI / 2]);
+    add(model, new T.CylinderGeometry(0.32, 0.36, 0.08, 8), [cup, cap, cap], [sd * 1.25, -0.78, 0], [1, 1, 1], [0, 0, Math.PI / 2]);
+    add(model, new T.TorusGeometry(0.34, 0.12, 4, 8), pad, [sd * 0.86, -0.78, 0], [1, 1, 1], [0, Math.PI / 2, 0]);
+  });
+  model.position.y = 0.45;
+  root.rotation.set(0.15, -0.5, 0);
+  return { root, cam: [0, 0.2, 6], look: [0, -0.1, 0], fov: 38 };
+}
+
+/* ------------------------------------------------------------------ a pair of dice (FanDuel)
+   Blue with white pips, so they stand out against the magnet's white sticker border. */
+function dice() {
+  const PIPS = { 1: [[.5, .5]], 2: [[.27, .27], [.73, .73]], 3: [[.25, .25], [.5, .5], [.75, .75]],
+    4: [[.27, .27], [.73, .27], [.27, .73], [.73, .73]], 5: [[.25, .25], [.75, .25], [.5, .5], [.25, .75], [.75, .75]],
+    6: [[.27, .23], [.73, .23], [.27, .5], [.73, .5], [.27, .77], [.73, .77]] };
+  const face = n => lam(0xffffff, { map: canvas(64, 64, (g) => {
+    g.fillStyle = '#1f6fd1'; g.fillRect(0, 0, 64, 64);
+    g.strokeStyle = '#17509a'; g.lineWidth = 3; g.strokeRect(1.5, 1.5, 61, 61);
+    g.fillStyle = '#ffffff';
+    for (const [x, y] of PIPS[n]) { g.beginPath(); g.arc(x * 64, y * 64, n === 1 ? 9 : 6.5, 0, 7); g.fill(); }
+  }) });
+  // box face order is +x, -x, +y, -y, +z, -z; opposite faces add up to 7
+  const die = () => new T.Mesh(new T.BoxGeometry(1, 1, 1), [face(3), face(4), face(5), face(2), face(1), face(6)]);
+  const root = new T.Group();
+  // one sits behind the other: they overlap on screen (one cut-out shape) without touching in 3D
+  const a = die(); a.position.set(-0.55, -0.1, -0.7); a.rotation.set(0.62, 0.55, 0.12); root.add(a);
+  const b = die(); b.position.set(0.55, 0.12, 0.7); b.rotation.set(-0.35, -0.6 + Math.PI, 0.5); root.add(b);
+  return { root, cam: [0, 0.9, 6.2], look: [0, 0, 0], fov: 30 };
+}
+
+/* ------------------------------------------------------------------ a basketball (NBA) */
+function basketball() {
+  // the seams are painted to match a reference photo, then projected straight onto the ball from the
+  // camera's side, so they land on screen exactly where they were drawn. Coordinates are in the
+  // photo's pixels: the ball there is centered at (275, 270) with a radius of 225.
+  const S = 512, P = (x, y) => [S / 2 + (x - 275) / 225 * S / 2, S / 2 + (y - 270) / 225 * S / 2];
+  const tex = canvas(S, S, (g) => {
+    g.fillStyle = '#c45f35'; g.fillRect(0, 0, S, S);
+    for (let i = 0; i < 9000; i++) { g.fillStyle = Math.random() < 0.5 ? 'rgba(90,35,15,.18)' : 'rgba(255,190,140,.12)'; g.fillRect(Math.random() * S, Math.random() * S, 2, 2); }
+    g.strokeStyle = '#2b1610'; g.lineWidth = 10; g.lineCap = 'round'; g.lineJoin = 'round';
+    const curve = (...pts) => { g.beginPath(); g.moveTo(...P(...pts[0])); for (let i = 1; i < pts.length; i += 3) g.bezierCurveTo(...P(...pts[i]), ...P(...pts[i + 1]), ...P(...pts[i + 2])); g.stroke(); };
+    curve([232, 40], [160, 130], [112, 240], [118, 320], [124, 400], [150, 460], [180, 500]);   // vertical seam, bowed left
+    curve([45, 298], [150, 322], [330, 325], [500, 283]);                                         // horizontal seam, just below center
+    curve([66, 205], [110, 268], [260, 250], [445, 108]);                                         // upper curve
+    curve([82, 376], [150, 368], [300, 430], [400, 484]);                                         // lower curve
+  });
+  const geo = new T.SphereGeometry(1, 32, 24), pos = geo.attributes.position, uv = geo.attributes.uv;
+  for (let i = 0; i < pos.count; i++) uv.setXY(i, (pos.getX(i) + 1) / 2, (pos.getY(i) + 1) / 2);
+  const root = new T.Group();
+  add(root, geo, lam(0xffffff, { map: tex }));
+  return { root, cam: [0, 0, 5.6], look: [0, 0, 0], fov: 28 };
+}
+
+/* ------------------------------------------------------------------ a 4th-place rosette (Fourth Place Engineering) */
+function rosette() {
+  const root = new T.Group(), green = lam('#2f9e6a'), greenD = lam('#23774f'), cream = '#fbf6e8';
+  // ruffle: a scalloped star, extruded
+  const s = new T.Shape(), N = 18;
+  for (let i = 0; i <= N * 2; i++) { const a = i / (N * 2) * Math.PI * 2, r = i % 2 ? 1.0 : 1.14; i ? s.lineTo(Math.cos(a) * r, Math.sin(a) * r) : s.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+  add(root, new T.ExtrudeGeometry(s, { depth: 0.12, bevelEnabled: false }), [green, greenD], [0, 0, -0.06]);
+  const s2 = new T.Shape(); for (let i = 0; i <= 28; i++) { const a = i / 28 * Math.PI * 2, r = i % 2 ? 0.74 : 0.82; i ? s2.lineTo(Math.cos(a) * r, Math.sin(a) * r) : s2.moveTo(Math.cos(a) * r, Math.sin(a) * r); }
+  add(root, new T.ExtrudeGeometry(s2, { depth: 0.1, bevelEnabled: false }), [lam(cream), lam('#d9d1bb')], [0, 0, 0.04]);
+  // button with "4th" on it
+  const label = canvas(128, 128, (g) => {
+    g.fillStyle = '#2f9e6a'; g.fillRect(0, 0, 128, 128);
+    g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '62px "Titan One", sans-serif';
+    g.lineJoin = 'round'; g.lineWidth = 10; g.strokeStyle = '#1c1a35'; g.strokeText('4th', 64, 66); g.fillStyle = cream; g.fillText('4th', 64, 66);
+  });
+  add(root, new T.CylinderGeometry(0.6, 0.6, 0.12, 14), [green, lam(0xffffff, { map: label }), green], [0, 0, 0.2], [1, 1, 1], [Math.PI / 2, 0, 0]).rotation.y = Math.PI / 2;
+  // two tails with notched ends
+  const tail = new T.Shape(); tail.moveTo(-0.25, 0); tail.lineTo(0.25, 0); tail.lineTo(0.25, -1.5); tail.lineTo(0, -1.28); tail.lineTo(-0.25, -1.5); tail.closePath();
+  [-1, 1].forEach(sd => add(root, new T.ExtrudeGeometry(tail, { depth: 0.05, bevelEnabled: false }), [green, greenD], [sd * 0.3, -0.55, -0.14], [1, 1, 1], [0.15, 0, sd * 0.28]));
+  root.position.y = 0.35; root.rotation.set(-0.12, -0.38, 0.06);
+  return { root, cam: [0, 0.2, 7.4], look: [0, -0.05, 0], fov: 28 };
+}
+
+const ICONS = { 'icon-headphones': headphones, 'icon-dice': dice, 'icon-basketball': basketball, 'icon-rosette': rosette };
+
+const renderer = new T.WebGLRenderer({ antialias: false, alpha: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(SIZE, SIZE, false); renderer.setClearColor(0, 0);
+function render(make) {
+  const scene = new T.Scene();
+  scene.add(new T.HemisphereLight(0xfff6e8, 0x7d8f8c, 0.85));
+  const key = new T.DirectionalLight(0xffffff, 0.62); key.position.set(-3, 5, 6); scene.add(key);
+  const rim = new T.DirectionalLight(0xffe9cf, 0.35); rim.position.set(4, 2, -5); scene.add(rim);
+  const { root, cam, look, fov } = make(); scene.add(root);
+  const camera = new T.PerspectiveCamera(fov, 1, 0.1, 100); camera.position.set(...cam); camera.lookAt(...look);
+  renderer.render(scene, camera);
+  // trim to the drawn pixels and center on a square, so every icon fills its space the same way
+  const src = renderer.domElement, c = document.createElement('canvas'); c.width = c.height = SIZE;
+  const g = c.getContext('2d'); g.drawImage(src, 0, 0);
+  const px = g.getImageData(0, 0, SIZE, SIZE).data;
+  let x0 = SIZE, y0 = SIZE, x1 = 0, y1 = 0;
+  for (let y = 0; y < SIZE; y++) for (let x = 0; x < SIZE; x++) if (px[(y * SIZE + x) * 4 + 3] > 8) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+  const side = Math.ceil(Math.max(x1 - x0, y1 - y0) * 1.04) + 2, out = document.createElement('canvas'); out.width = out.height = side;
+  out.getContext('2d').drawImage(src, x0, y0, x1 - x0 + 1, y1 - y0 + 1, Math.round((side - (x1 - x0)) / 2), Math.round((side - (y1 - y0)) / 2), x1 - x0 + 1, y1 - y0 + 1);
+  return out.toDataURL('image/png');
+}
+
+window.renderIcons = async () => {
+  await document.fonts.load('62px "Titan One"').catch(() => {});
+  const out = {};
+  for (const [name, make] of Object.entries(ICONS)) out[name] = render(make);
+  return out;
+};
+window.renderIcons().then(out => {
+  const grid = document.getElementById('grid');
+  for (const [name, url] of Object.entries(out)) {
+    const fig = document.createElement('figure'), img = document.createElement('img'), cap = document.createElement('figcaption');
+    img.src = url; img.alt = name; cap.textContent = name + '.png'; fig.append(img, cap); grid.append(fig);
+  }
+  window.iconsReady = true;
+});
+</script>
+</body>
+</html>

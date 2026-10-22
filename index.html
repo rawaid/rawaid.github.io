@@ -81,6 +81,33 @@ button{font:inherit;color:inherit}
 .sheet .x{position:sticky;top:0;float:right;margin:-4px -4px 0 0}
 .sheet .x.icon-btn{position:sticky}
 
+/* project card */
+.project{position:relative;width:min(720px,100%);max-height:100%;overflow:auto;box-sizing:border-box;background:var(--cream);color:var(--ink);border:4px solid var(--ink);border-radius:18px;box-shadow:0 8px 0 var(--ink);padding:22px 24px 18px;transform:translateY(10px) scale(.98);transition:transform .3s cubic-bezier(.2,1.3,.4,1)}
+.modal.show .project{transform:none}
+.project .icon-btn{top:14px;right:14px}
+.pj-head{display:grid;grid-template-columns:112px minmax(0,1fr);gap:18px;align-items:center;margin-right:50px}
+.pj-head img{width:112px;height:112px;object-fit:contain;filter:drop-shadow(0 4px 0 rgba(28,26,53,.2))}
+.pj-side{display:inline-block;margin:0 0 8px;padding:3px 8px 2px;border:2px solid var(--ink);border-radius:6px;background:var(--ink);color:#fff;font-family:var(--f-pixel);font-size:11px;letter-spacing:.08em}
+.pj-side[data-side="personal"]{background:var(--tomato)}
+.project h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(26px,4vw,34px);line-height:1.05;letter-spacing:.01em;text-wrap:balance}
+.pj-role{margin:6px 0 0;font-size:18px;font-weight:800}
+.pj-meta{margin:2px 0 0;font-size:15px;font-weight:600;color:#5d5872}
+.pj-role:empty,.pj-meta:empty,.pj-links:empty{display:none}
+.pj-body{margin-top:18px;font-size:17px;line-height:1.55;font-weight:600}
+.pj-body p{margin:0 0 12px;max-width:62ch}
+.pj-body ul{margin:0 0 14px;padding-left:1.25em;max-width:62ch}
+.pj-body li{margin:0 0 6px;padding-left:2px}
+.pj-body li::marker{color:var(--tomato)}
+.pj-body .pj-tags{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4px 0 14px}
+.pj-tags li{margin:0;padding:4px 8px 3px;background:#fff;border:2px solid var(--ink);border-radius:7px;font-family:var(--f-pixel);font-size:11px;letter-spacing:.04em}
+.pj-links{display:flex;flex-wrap:wrap;gap:8px}
+.pj-links a{font-family:var(--f-display);font-size:15px;letter-spacing:.02em;color:var(--ink);background:var(--sun);border:3px solid var(--ink);border-radius:10px;padding:5px 12px 6px;box-shadow:0 3px 0 var(--ink);text-decoration:none}
+.pj-links a:hover{background:#ffd866}
+.pj-links a:focus-visible{outline:3px solid var(--tomato);outline-offset:3px}
+.pj-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;padding-top:14px;border-top:2px dashed rgba(28,26,53,.25)}
+.pj-foot .pill{font-size:14px;padding:5px 12px 6px;max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pj-foot .num{font-family:var(--f-pixel);font-size:11px;color:#5d5872;font-variant-numeric:tabular-nums}
+
 /* leave a photo */
 .card{width:min(420px,100%);background:var(--cream);color:var(--ink);border:4px solid var(--ink);border-radius:18px;box-shadow:0 8px 0 var(--ink);padding:22px 20px;display:grid;gap:12px;text-align:center}
 .card h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:28px;color:var(--tomato);-webkit-text-stroke:.1em var(--ink);paint-order:stroke fill;text-shadow:0 .1em 0 var(--ink);letter-spacing:.02em}
@@ -109,13 +136,17 @@ button{font:inherit;color:inherit}
   .grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
   .thumb{grid-template-rows:110px auto}
   .thumb img{max-height:110px}
+  .project{padding:18px 16px 14px}
+  .pj-head{grid-template-columns:72px minmax(0,1fr);gap:12px;margin-right:46px}
+  .pj-head img{width:72px;height:72px}
+  .pj-body{font-size:16px}
 }
 @media (prefers-reduced-motion:reduce){
-  .modal,.lb-frame img{transition:none}
+  .modal,.lb-frame img,.project{transition:none}
 }
 </style>
 
-<canvas id="stage" tabindex="0" role="img" aria-label="A low-poly 3D model of Ali's fridge covered in portfolio pieces and travel magnets. Drag or use the arrow keys to spin it, and click anything to see it up close. Press L for a list of everything on it, or G to see the guest book on its side."></canvas>
+<canvas id="stage" tabindex="0" role="img" aria-label="A low-poly 3D model of Ali's fridge with portfolio pieces stuck to it. Drag or use the arrow keys to spin it, and click anything to see it up close. Press L for a list of everything on it, or G to see the guest book on its side."></canvas>
 
 
 <div id="tip" class="tip" hidden></div>
@@ -143,11 +174,37 @@ button{font:inherit;color:inherit}
   </div>
 </div>
 
+<div id="project" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="pjTitle">
+  <article class="project">
+    <button class="icon-btn" id="pjClose" type="button" aria-label="Close">✕</button>
+    <header class="pj-head">
+      <img id="pjIcon" alt="">
+      <div>
+        <p class="pj-side" id="pjSide"></p>
+        <h2 id="pjTitle"></h2>
+        <p class="pj-role" id="pjRole"></p>
+        <p class="pj-meta" id="pjMeta"></p>
+      </div>
+    </header>
+    <div class="pj-body">
+      <p id="pjSummary"></p>
+      <ul id="pjPoints"></ul>
+      <ul class="pj-tags" id="pjTags" aria-label="Tools"></ul>
+      <p class="pj-links" id="pjLinks"></p>
+    </div>
+    <footer class="pj-foot">
+      <button class="pill" id="pjPrev" type="button"></button>
+      <span class="num" id="pjNum"></span>
+      <button class="pill" id="pjNext" type="button"></button>
+    </footer>
+  </article>
+</div>
+
 <div id="list" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="listTitle">
   <div class="sheet">
     <button class="icon-btn x" id="listClose" type="button" aria-label="Close list">✕</button>
     <h2 id="listTitle">Everything on the fridge</h2>
-    <p class="sub" id="listSub">Freezer door first, then the fridge door, top to bottom.</p>
+    <p class="sub" id="listSub">Work on the freezer door, personal projects on the fridge door.</p>
     <div class="grid" id="grid"></div>
   </div>
 </div>
@@ -191,71 +248,189 @@ button{font:inherit;color:inherit}
 <div id="toast" class="toast gone" role="status" aria-live="polite"></div>
 
 <script>
-const DATA = {"items":[{"id":"slot01","door":"left","z":1,"shape":"rect","cx":96.8,"cy":85.2,"w":51.6,"h":160.6,"a":3.9,"thick":0,"slot":1},{"id":"mindo","door":"left","z":2,"kind":"Magnet","title":"Mindo, Ecuador","shape":"circle","cx":237.0,"cy":45.0,"w":64.0,"h":64.0,"a":0.0,"thick":6,"hi":"img/hi/mindo.png","lo":"img/lo/mindo.png","hiW":288,"hiH":288,"c":[237,45],"r":32},{"id":"slot05","door":"left","z":1,"shape":"rect","cx":298.5,"cy":136.5,"w":37.1,"h":207.3,"a":-4.6,"thick":0,"slot":5},{"id":"slot02","door":"left","z":1,"shape":"rect","cx":341.8,"cy":109.2,"w":47.5,"h":152.5,"a":0.6,"thick":0,"slot":2},{"id":"puzzle","door":"left","z":3,"kind":"Magnet","title":"Map puzzle piece","shape":"poly","cx":141.2,"cy":101.0,"w":47.5,"h":73.0,"a":0.0,"thick":4,"hi":"img/hi/puzzle.png","lo":"img/lo/puzzle.png","hiW":214,"hiH":328,"poly":[[118.5,96],[128,83],[139,71],[145,65.5],[152,67],[161,77],[163.5,83],[156,86],[154,91],[157,98],[162,102],[164,107],[162,114],[161,125],[158,135.5],[148,136.5],[141,130],[141,123],[138,116],[128,108]]},{"id":"nye2008","door":"left","z":3,"kind":"Magnet","title":"New Year's 2008, New York","shape":"rect","cx":188.0,"cy":91.0,"w":47.0,"h":54.1,"a":2.4,"thick":5,"hi":"img/hi/nye2008.jpg","lo":"img/lo/nye2008.jpg","hiW":212,"hiH":243},{"id":"slot03","door":"left","z":2,"shape":"rect","cx":167.0,"cy":177.2,"w":52.3,"h":167.0,"a":-6.0,"thick":0,"slot":3},{"id":"slot04","door":"left","z":1,"shape":"rect","cx":229.0,"cy":165.5,"w":46.1,"h":153.4,"a":3.7,"thick":0,"slot":4},{"id":"slot06","door":"left","z":1,"shape":"rect","cx":62.5,"cy":242.8,"w":51.1,"h":158.9,"a":-3.9,"thick":0,"slot":6},{"id":"placid","door":"left","z":3,"kind":"Magnet","title":"Lake Placid","shape":"poly","cx":119.4,"cy":282.5,"w":55.3,"h":83.0,"a":0.0,"thick":6,"hi":"img/hi/placid.png","lo":"img/lo/placid.png","hiW":249,"hiH":374,"poly":[[111,253],[119.3,244.7],[129.3,242],[139.3,246.3],[145,256.3],[146,264.7],[141.8,273.8],[136,278],[144.3,293],[136,308],[122.7,321.3],[114.3,323],[106,311],[97.7,296.3],[92.7,279.7],[94.3,269.7],[102.7,263.8]]},{"id":"slot08","door":"left","z":1.5,"shape":"rect","cx":216.8,"cy":276.2,"w":131.7,"h":55.6,"a":2.8,"thick":0,"slot":8},{"id":"slot07","door":"left","z":2,"shape":"rect","cx":172.2,"cy":327.5,"w":84.6,"h":62.1,"a":0.0,"thick":0,"slot":7},{"id":"slot09","door":"left","z":3,"shape":"rect","cx":135.0,"cy":379.8,"w":154.1,"h":48.8,"a":31.1,"thick":0,"slot":9},{"id":"slot10","door":"left","z":1,"shape":"rect","cx":180.2,"cy":411.0,"w":48.5,"h":80.0,"a":0.0,"thick":0,"slot":10},{"id":"slot11","door":"left","z":1,"shape":"rect","cx":251.0,"cy":380.8,"w":38.0,"h":166.7,"a":-2.3,"thick":0,"slot":11},{"id":"slot13","door":"right","z":1,"shape":"rect","cx":479.0,"cy":139.8,"w":131.2,"h":155.5,"a":2.4,"thick":0,"slot":13},{"id":"slot12","door":"right","z":1,"shape":"rect","cx":645.0,"cy":71.8,"w":85.0,"h":108.5,"a":-1.0,"thick":0,"slot":12},{"id":"usgs","door":"right","z":2,"kind":"Magnet","title":"USGS benchmark","shape":"circle","cx":652.0,"cy":112.0,"w":42.0,"h":42.0,"a":0.0,"thick":7,"hi":"img/hi/usgs.png","lo":"img/lo/usgs.png","hiW":189,"hiH":189,"c":[652,112],"r":21},{"id":"slot15","door":"right","z":1,"shape":"rect","cx":686.8,"cy":162.2,"w":84.4,"h":48.8,"a":-23.4,"thick":0,"slot":15},{"id":"slot14","door":"right","z":2,"shape":"rect","cx":652.2,"cy":202.0,"w":51.5,"h":79.0,"a":2.2,"thick":0,"slot":14},{"id":"slot19","door":"right","z":1,"shape":"rect","cx":586.8,"cy":270.0,"w":36.5,"h":200.0,"a":0.0,"thick":0,"slot":19},{"id":"slot18","door":"right","z":1,"shape":"rect","cx":503.2,"cy":298.8,"w":89.5,"h":155.6,"a":1.6,"thick":0,"slot":18},{"id":"slot17","door":"right","z":2,"shape":"rect","cx":502.0,"cy":318.2,"w":48.4,"h":150.2,"a":31.9,"thick":0,"slot":17},{"id":"slot21","door":"right","z":1,"shape":"rect","cx":774.0,"cy":236.5,"w":87.0,"h":129.0,"a":0.0,"thick":0,"slot":21},{"id":"slot16","door":"right","z":2,"shape":"rect","cx":813.0,"cy":217.5,"w":45.3,"h":90.4,"a":-6.3,"thick":0,"slot":16},{"id":"slot20","door":"right","z":1,"shape":"rect","cx":668.0,"cy":327.8,"w":65.0,"h":46.9,"a":-0.4,"thick":0,"slot":20},{"id":"slot22","door":"right","z":2,"shape":"rect","cx":693.5,"cy":403.0,"w":94.9,"h":67.8,"a":-34.7,"thick":0,"slot":22},{"id":"slot26","door":"right","z":1,"shape":"rect","cx":804.5,"cy":449.2,"w":59.4,"h":82.5,"a":-6.3,"thick":0,"slot":26},{"id":"opener","door":"right","z":2,"kind":"Magnet","title":"Smiley bottle opener","shape":"circles","cx":809.5,"cy":409.0,"w":45.0,"h":140.0,"a":0.0,"thick":5,"hi":"img/hi/opener.png","lo":"img/lo/opener.png","hiW":202,"hiH":630,"circles":[[805,357,17],[807,393,17],[810,427,17],[813,460,18]]},{"id":"slot23","door":"right","z":1,"shape":"rect","cx":511.0,"cy":490.0,"w":120.9,"h":172.0,"a":20.8,"thick":0,"slot":23},{"id":"chile","door":"right","z":2.5,"kind":"Magnet","title":"Chile","shape":"rect","cx":506.8,"cy":430.2,"w":57.6,"h":54.6,"a":30.8,"thick":5,"hi":"img/hi/chile.jpg","lo":"img/lo/chile.jpg","hiW":259,"hiH":246},{"id":"slot28","door":"right","z":0.5,"shape":"rect","cx":641.5,"cy":550.2,"w":49.0,"h":77.6,"a":0.6,"thick":0,"slot":28},{"id":"slot24","door":"right","z":1,"shape":"rect","cx":604.8,"cy":498.2,"w":51.6,"h":74.6,"a":-2.8,"thick":0,"slot":24},{"id":"slot25","door":"right","z":1.5,"shape":"rect","cx":666.5,"cy":489.0,"w":48.9,"h":150.6,"a":-30.8,"thick":0,"slot":25},{"id":"slot27","door":"right","z":0.5,"shape":"rect","cx":551.5,"cy":621.2,"w":81.0,"h":111.5,"a":-1.1,"thick":0,"slot":27},{"id":"slot30","door":"right","z":1,"shape":"rect","cx":743.8,"cy":631.0,"w":153.4,"h":115.1,"a":-6.4,"thick":0,"slot":30},{"id":"slot29","door":"right","z":1.5,"shape":"rect","cx":742.5,"cy":572.5,"w":72.2,"h":53.9,"a":-43.9,"thick":0,"slot":29},{"id":"chiva","door":"right","z":2.5,"kind":"Magnet","title":"Chiva bus, Colombia","shape":"poly","cx":656.8,"cy":681.0,"w":53.5,"h":90.0,"a":0.0,"thick":8,"hi":"img/hi/chiva.png","lo":"img/lo/chiva.png","hiW":241,"hiH":405,"poly":[[665,637],[675,639.5],[680,650],[680,665],[678,674],[682.5,690],[682.5,705],[675,710],[662,719],[652,725],[643,723],[635,710],[631,699],[631,680],[635,669],[647,662],[652,650],[658,640]]},{"id":"slot31","door":"right","z":1,"shape":"rect","cx":568.0,"cy":754.0,"w":155.8,"h":104.4,"a":-21.5,"thick":0,"slot":31}],"dots":[[117,20],[228,89],[77,191],[245,350],[462,104],[672,302],[543,755]],"bars":[{"c":[292,33],"w":43,"h":10,"a":-38}],"clips":[{"c":[540,230],"w":38,"h":42,"a":-20}]};
-</script>
-<script>
-/* Portfolio pieces, in fridge reading order: freezer door top to bottom, then fridge door.
-   Each entry fills the next spot; spots without an entry show a numbered placeholder card.
-   Put images in img/portfolio/. They're cropped to fit their spot on the fridge and shown
-   whole in the lightbox. Spot shapes vary a lot (tall strips, wide cards), so press L on
-   the site to see which spot is which. */
+/* Portfolio pieces: work on the freezer door (left), personal projects on the fridge door (right),
+   top to bottom in the order listed. Each is a die-cut magnet of its low-poly icon (made by
+   tools/icons.html); clicking one opens its project card. Without an icon a piece gets a title card
+   instead, and img: "img/portfolio/<file>" shows a screenshot card.
+   Card fields: role, dates, place, summary, points (bullets), tags, links ({ label, href }). */
 const PORTFOLIO = [
-  // { title: "stats.nba.com", kind: "Web app", img: "img/portfolio/nba-stats.jpg" },
+  { side: 'work', title: 'FanDuel', icon: 'img/portfolio/icon-dice.png',
+    role: 'Senior Software Engineer', dates: 'May 2018 – present', place: 'New York, NY',
+    summary: "I lead frontend development for FanDuel's Fantasy and Sportsbook products, on the web with React and Redux and in the React Native app.",
+    points: [
+      'Led a React Native architecture modernization, upgrading the app from 0.71 to 0.81.5 in about six months, including adopting Fabric.',
+      'Improved build stability, performance and long-term maintainability while keeping parallel feature work unblocked.',
+      'Scaled the Sanity CMS setup that powers the dynamic homepage layouts content operations uses every day.',
+      'Manage and mentor frontend engineers, and lead hiring through interviews and onboarding.',
+      'Use AI-assisted tools like Cursor and Claude for refactors, test generation and getting around the codebase.',
+    ],
+    tags: ['React', 'React Native', 'Redux', 'TypeScript', 'Fabric', 'Sanity CMS'],
+    links: [{ label: 'fanduel.com', href: 'https://www.fanduel.com' }] },
+  { side: 'work', title: 'NBA', icon: 'img/portfolio/icon-basketball.png',
+    role: 'UI Developer', dates: 'Nov 2015 – Jan 2018', place: 'New York, NY',
+    summary: 'I built UI for stats.nba.com and related NBA properties: data-heavy pages that a lot of people use.',
+    points: [
+      'Built and maintained data-heavy, high-traffic UI features for stats.nba.com and related properties.',
+      'Worked across teams to ship frontend that was fast and reliable.',
+    ],
+    links: [{ label: 'stats.nba.com', href: 'https://www.nba.com/stats' }] },
+  { side: 'personal', title: 'Perfect Eater Radio', icon: 'img/portfolio/icon-headphones.png',
+    role: 'Founder & Engineer', dates: '2025 – present',
+    // draft from the resume until Ali's own write-up is in
+    summary: 'A self-hosted internet radio station, built and run end to end.',
+    points: [
+      'Runs on a DigitalOcean droplet: MediaMTX takes the RTMP stream in and serves HLS, with Caddy as the HTTPS reverse proxy.',
+      'The frontend is React and TypeScript, with HLS.js for live playback, Motion for animation, a custom morphing SVG logo and an animated listener count.',
+      'A middleware adapter on Railway reports real-time stream status, and a flat archive holds 55+ recorded shows.',
+      'Every infrastructure call is mine: stream ingest, CDN setup, playback race conditions and the OBS audio pipeline on macOS.',
+    ],
+    tags: ['React', 'TypeScript', 'HLS.js', 'MediaMTX', 'Caddy', 'DigitalOcean'],
+    links: [{ label: 'perfecteater.com', href: 'https://perfecteater.com' }] },
+  { side: 'personal', title: 'Fourth Place Engineering', icon: 'img/portfolio/icon-rosette.png',
+    summary: 'Write-up coming soon.' },
 ];
+// start the icons loading now; the magnets are cut once they arrive
+for (const p of PORTFOLIO) if (p.icon) { p.iconImg = new Image(); p.iconImg.src = p.icon; }
 
 /* Guest book backend: the URL the worker in worker/ is deployed at, e.g. "https://fridge-guestbook.you.workers.dev".
    Leave it empty and guest book entries only show up in the browser of whoever left them. */
 const GUESTBOOK_API = 'https://fridge-guestbook.fridge-guestbook.workers.dev';
 
-const PLACEHOLDER_COLORS = ['#e5473a', '#f6c445', '#3ba55b', '#4f8fd8', '#8a6bd1'];
-function placeholderCard(it) {
-  const S = 600 / Math.max(it.w, it.h);
-  const W = Math.round(it.w * S), H = Math.round(it.h * S);
+/* Layout in mm: x from the fridge's left edge (430 is the middle), y down from the top of the doors.
+   The two columns mirror each other about the middle, under a label at the top of each door;
+   the freezer's water dispenser starts at y 470. */
+const MAGNET = { area: 19000, max: 240 };  // icon magnets: about the same visible area each (mm²), longest side capped
+const CARD = { w: 280, h: 196 };   // title and screenshot cards
+const SIDES = {
+  work: { door: 'left', label: 'WORK', color: '#1c1a35', spots: [{ cx: 180, cy: 182, a: -4 }, { cx: 180, cy: 388, a: 3 }] },
+  personal: { door: 'right', label: 'PERSONAL', color: '#e5473a', spots: [{ cx: 680, cy: 182, a: 4 }, { cx: 680, cy: 388, a: -3 }] },
+};
+const LABEL_Y = 44;   // center of the label tapes; they're 52mm tall
+const CARD_COLORS = ['#e5473a', '#f6c445', '#4f8fd8', '#8a6bd1'];
+
+// items: the pieces; dots: little round magnets holding cards up; bars and clips: other hardware
+const DATA = { items: [], dots: [], bars: [], clips: [] };
+
+// die-cut magnet: the icon on a white sticker border that follows its outline, plus that outline as
+// a polygon (0..1 across the image) for the magnet's shape
+function iconMagnet(img) {
+  const B = Math.round(Math.max(img.naturalWidth, img.naturalHeight) * 0.035), W = img.naturalWidth + B * 2, H = img.naturalHeight + B * 2;
+  const sil = document.createElement('canvas'); sil.width = W; sil.height = H;
+  const s = sil.getContext('2d');
+  for (let k = 0; k < 24; k++) { const a = k / 24 * Math.PI * 2; s.drawImage(img, B + Math.cos(a) * B, B + Math.sin(a) * B); }
+  s.globalCompositeOperation = 'source-in'; s.fillStyle = '#ffffff'; s.fillRect(0, 0, W, H);
+
+  // trace the sticker's edge on a small grid, then thin out the points
+  const N = 128, m = document.createElement('canvas'); m.width = m.height = N;
+  const mg = m.getContext('2d'), sc = N / Math.max(W, H); mg.drawImage(sil, 0, 0, W * sc, H * sc);
+  const px = mg.getImageData(0, 0, N, N).data, on = (x, y) => x >= 0 && y >= 0 && x < N && y < N && px[(y * N + x) * 4 + 3] > 96;
+  const dirs = [[-1, 0], [-1, -1], [0, -1], [1, -1], [1, 0], [1, 1], [0, 1], [-1, 1]];
+  let sx = -1, sy = -1;
+  find: for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) if (on(x, y)) { sx = x; sy = y; break find; }
+  const pts = [];
+  for (let x = sx, y = sy, back = 0, guard = 0; guard < N * N * 2; guard++) {
+    pts.push([x, y]);
+    let moved = false;
+    for (let k = 1; k <= 8; k++) {
+      const i = (back + k) % 8, nx = x + dirs[i][0], ny = y + dirs[i][1];
+      if (!on(nx, ny)) continue;
+      const b = dirs[(i + 7) % 8], bx = x + b[0] - nx, by = y + b[1] - ny;
+      x = nx; y = ny; back = dirs.findIndex(d => d[0] === bx && d[1] === by); moved = true; break;
+    }
+    if (!moved || (x === sx && y === sy)) break;
+  }
+  const simplify = (p, eps) => {
+    if (p.length < 3) return p;
+    const [a, b] = [p[0], p[p.length - 1]], dx = b[0] - a[0], dy = b[1] - a[1], len = Math.hypot(dx, dy) || 1;
+    let far = 0, at = 0;
+    for (let i = 1; i < p.length - 1; i++) { const d = Math.abs(dy * p[i][0] - dx * p[i][1] + b[0] * a[1] - b[1] * a[0]) / len; if (d > far) { far = d; at = i; } }
+    return far > eps ? [...simplify(p.slice(0, at + 1), eps).slice(0, -1), ...simplify(p.slice(at), eps)] : [a, b];
+  };
+  const half = pts.length >> 1, outline = [...simplify(pts.slice(0, half + 1), 0.7).slice(0, -1), ...simplify(pts.slice(half).concat([pts[0]]), 0.7).slice(0, -1)];
+  // grid cells to 0..1 (cell centers); the white backing fills the whole outline, gaps included
+  const poly = outline.map(([x, y]) => [(x + 0.5) / sc / W, (y + 0.5) / sc / H]);
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d'); g.fillStyle = '#ffffff'; g.beginPath();
+  poly.forEach(([u, v], i) => i ? g.lineTo(u * W, v * H) : g.moveTo(u * W, v * H)); g.closePath(); g.fill();
+  g.drawImage(img, B, B);
+  // on the fridge the magnet's own shape does the cutting, so its texture is solid white around the icon:
+  // no see-through edge to blur when it's small
+  const t = document.createElement('canvas'); t.width = W; t.height = H;
+  const tg = t.getContext('2d'); tg.fillStyle = '#ffffff'; tg.fillRect(0, 0, W, H); tg.drawImage(img, B, B);
+  return { url: c.toDataURL('image/png'), tex: t.toDataURL('image/png'), w: W, h: H, outline: poly };
+}
+
+function titleCard(p, color) {
+  const W = 600, H = Math.round(600 * CARD.h / CARD.w), u = H;
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const g = c.getContext('2d');
-  // tall strips get their text turned to run along the long side
-  const turn = H > W * 1.6, lw = turn ? H : W, lh = turn ? W : H;
-  if (turn) { g.translate(0, H); g.rotate(-Math.PI / 2); }
-  const u = Math.min(lw, lh), color = PLACEHOLDER_COLORS[(it.slot - 1) % PLACEHOLDER_COLORS.length];
-  g.fillStyle = color; g.fillRect(0, 0, lw, lh);
+  g.fillStyle = color; g.fillRect(0, 0, W, H);
   g.fillStyle = 'rgba(255,255,255,.18)';
-  for (let x = -lh; x < lw; x += u * 0.16) { g.beginPath(); g.moveTo(x, lh); g.lineTo(x + lh, 0); g.lineTo(x + lh + u * 0.06, 0); g.lineTo(x + u * 0.06, lh); g.fill(); }
-  g.strokeStyle = '#1c1a35'; g.lineWidth = u * 0.06; g.strokeRect(0, 0, lw, lh);
+  for (let x = -H; x < W; x += u * 0.16) { g.beginPath(); g.moveTo(x, H); g.lineTo(x + H, 0); g.lineTo(x + H + u * 0.06, 0); g.lineTo(x + u * 0.06, H); g.fill(); }
+  g.strokeStyle = '#1c1a35'; g.lineWidth = u * 0.05; g.strokeRect(0, 0, W, H);
   g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
-  // big cream number with the chunky ink outline the rest of the page uses
-  const num = String(it.slot).padStart(2, '0'), big = Math.min(lh * 0.62, lw * 0.42), ny = lh * 0.42;
-  g.font = `${Math.round(big)}px "Titan One", "Arial Rounded MT Bold", sans-serif`;
-  g.lineWidth = big * 0.16; g.strokeStyle = '#1c1a35';
-  g.strokeText(num, lw / 2, ny + big * 0.08); g.strokeText(num, lw / 2, ny);
-  g.fillStyle = '#fbf6e8'; g.fillText(num, lw / 2, ny);
-  // little paper tag underneath
-  const fs = Math.round(Math.min(big * 0.2, lw * 0.075));
-  g.font = `${fs}px Silkscreen, "Courier New", monospace`;
-  const label = 'COMING SOON', tw = g.measureText(label).width + fs * 1.2, ty = Math.min(lh - fs * 1.2, ny + big * 0.62);
-  g.fillStyle = '#fbf6e8'; g.fillRect(lw / 2 - tw / 2, ty - fs * 0.8, tw, fs * 1.6);
-  g.lineWidth = Math.max(2, fs * 0.15); g.strokeRect(lw / 2 - tw / 2, ty - fs * 0.8, tw, fs * 1.6);
-  g.fillStyle = '#1c1a35'; g.fillText(label, lw / 2, ty + fs * 0.05);
+  // biggest size at which the title wraps into the card in two lines or fewer
+  const font = s => `${Math.round(s)}px "Titan One", "Arial Rounded MT Bold", sans-serif`;
+  let size = H * 0.34, lines;
+  for (; size > 12; size *= 0.94) {
+    g.font = font(size); lines = [];
+    for (const word of p.title.split(' ')) {
+      const last = lines[lines.length - 1];
+      if (last && g.measureText(last + ' ' + word).width <= W * 0.84) lines[lines.length - 1] = last + ' ' + word; else lines.push(word);
+    }
+    if (lines.length <= 2 && Math.max(...lines.map(l => g.measureText(l).width)) <= W * 0.84 && lines.length * size * 1.05 <= H * (p.role ? 0.56 : 0.68)) break;
+  }
+  // cream lettering with the chunky ink outline the rest of the page uses
+  const lh = size * 1.05, top = H * (p.role ? 0.42 : 0.5) - (lines.length - 1) * lh / 2;
+  g.font = font(size); g.lineWidth = size * 0.16; g.strokeStyle = '#1c1a35';
+  lines.forEach((l, i) => { g.strokeText(l, W / 2, top + i * lh + size * 0.07); g.strokeText(l, W / 2, top + i * lh); });
+  g.fillStyle = '#fbf6e8'; lines.forEach((l, i) => g.fillText(l, W / 2, top + i * lh));
+  if (p.role) {
+    // little paper tag underneath, shrunk to fit
+    const label = p.role.toUpperCase();
+    let fs = Math.round(H * 0.075);
+    g.font = `${fs}px Silkscreen, "Courier New", monospace`;
+    const fit = W * 0.84 / (g.measureText(label).width + fs * 1.2);
+    if (fit < 1) { fs = Math.floor(fs * fit); g.font = `${fs}px Silkscreen, "Courier New", monospace`; }
+    const bw = g.measureText(label).width + fs * 1.2, ty = H * 0.8;
+    g.fillStyle = '#fbf6e8'; g.fillRect(W / 2 - bw / 2, ty - fs * 0.8, bw, fs * 1.6);
+    g.lineWidth = Math.max(2, fs * 0.15); g.strokeRect(W / 2 - bw / 2, ty - fs * 0.8, bw, fs * 1.6);
+    g.fillStyle = '#1c1a35'; g.fillText(label, W / 2, ty + fs * 0.05);
+  }
   return { url: c.toDataURL('image/png'), w: W, h: H };
 }
 
-// give every non-magnet spot its portfolio piece, or a placeholder
+// put each portfolio piece in its spot on its side's door: icon magnets on their own, cards held up by a little magnet
 let slotsFilled = false;
 function fillSlots() {
   if (slotsFilled) return; slotsFilled = true;
-  for (const it of DATA.items) {
-    if (!it.slot) continue;
-    const p = PORTFOLIO[it.slot - 1];
-    if (p && p.img) {
-      it.title = p.title || 'Untitled'; it.kind = p.kind || 'Portfolio';
+  const used = { work: 0, personal: 0 };
+  PORTFOLIO.forEach((p, i) => {
+    const key = p.side in SIDES ? p.side : 'work', side = SIDES[key], s = side.spots[used[key]++];
+    if (!s) return;
+    const it = { id: 'project' + (i + 1), door: side.door, project: p, z: 1, shape: 'rect', cx: s.cx, cy: s.cy, w: CARD.w, h: CARD.h, a: s.a, thick: 0,
+      title: p.title || 'Untitled', kind: p.role || (p.side === 'personal' ? 'Personal project' : 'Work') };
+    const icon = !p.img && p.iconImg && p.iconImg.complete && p.iconImg.naturalWidth ? iconMagnet(p.iconImg) : null;
+    if (icon) {
+      // scale so the sticker itself (not its transparent box) covers MAGNET.area
+      const o = icon.outline, frac = Math.abs(o.reduce((sum, [x, y], j) => { const [nx, ny] = o[(j + 1) % o.length]; return sum + x * ny - nx * y; }, 0)) / 2;
+      const k = Math.min(Math.sqrt(MAGNET.area / (frac * icon.w * icon.h)), MAGNET.max / Math.max(icon.w, icon.h));
+      Object.assign(it, { shape: 'poly', w: icon.w * k, h: icon.h * k, thick: 7, edge: 0xd2cbbb, hi: icon.url, lo: icon.url, tex: icon.tex, hiW: icon.w, hiH: icon.h });
+      it.poly = icon.outline.map(([u, v]) => [s.cx + (u - 0.5) * it.w, s.cy + (v - 0.5) * it.h]);
+      DATA.items.push(it);
+      return;
+    }
+    if (p.img) {
       it.hi = it.lo = p.img; it.cover = true;
       it.hiW = 1000; it.hiH = Math.round(1000 * it.h / it.w); // corrected once the image loads
     } else {
-      const ph = placeholderCard(it);
-      it.title = (p && p.title) || 'Project ' + String(it.slot).padStart(2, '0');
-      it.kind = (p && p.kind) || 'Coming soon';
-      it.hi = it.lo = ph.url; it.hiW = ph.w; it.hiH = ph.h;
+      const card = titleCard(p, CARD_COLORS[i % CARD_COLORS.length]);
+      it.hi = it.lo = card.url; it.hiW = card.w; it.hiH = card.h;
     }
-  }
+    DATA.items.push(it);
+    const d = CARD.h / 2 - 16, a = s.a * Math.PI / 180;
+    DATA.dots.push([s.cx + Math.sin(a) * d, s.cy - Math.cos(a) * d]);
+  });
 }
 </script>
 <script>
@@ -282,13 +457,15 @@ const TAU = Math.PI * 2;
 const DOOR_TOP = 1.75, FRONT_Z = 0.36, BACK_Z = -0.38, FW = 0.86;
 const WHERE = { left: 'FREEZER DOOR', right: 'FRIDGE DOOR', back: 'BACK OF THE FRIDGE' };
 
-// placeholder cards are drawn with the display fonts, so give them a moment to arrive
-if (document.fonts) await Promise.race([
-  Promise.all([document.fonts.load('40px "Titan One"'), document.fonts.load('12px Silkscreen')]).catch(() => {}),
-  new Promise(r => setTimeout(r, 2000))]);
+// magnets are cut from the icons and cards drawn with the display fonts, so give them a moment to arrive
+await Promise.race([
+  Promise.all([
+    document.fonts && document.fonts.load('40px "Titan One"'), document.fonts && document.fonts.load('12px Silkscreen'),
+    ...PORTFOLIO.map(p => p.iconImg && p.iconImg.decode())].map(x => Promise.resolve(x).catch(() => {}))),
+  new Promise(r => setTimeout(r, 3000))]);
 fillSlots();
 
-// reading order: freezer door, then fridge door, top to bottom in bands
+// reading order: freezer door (work), then fridge door (personal), top to bottom in bands
 const ITEMS = DATA.items.slice().sort((a, b) =>
   (a.door === b.door ? 0 : a.door === 'left' ? -1 : 1) ||
   (Math.floor(a.cy / 110) - Math.floor(b.cy / 110)) || (a.cx - b.cx));
@@ -518,6 +695,148 @@ const plantLeaves = [];
   box(0.12, 0.02, 0.05, lam(0x2a2a2a), 0, 0.03, 0.2, g);
 }
 
+/* ------------------------------------------------------------------ Ali, waving from beside the fridge
+   The "Ali Avatar" model, smiling, with one arm up. Built about 3.6 units tall; his head is big, so he's
+   scaled to about half the fridge's height, short enough to stay under the guest book. */
+const ali = {};
+{
+  const C = { skin: '#b07650', skinD: '#93603f', hair: '#221b18', shirt: '#efe5c2', shorts: '#3f69ae', shoe: '#f2efe8', metal: '#5f636b' };
+  const M = { skin: lam(C.skin), skinD: lam(C.skinD), hair: lam(C.hair), shirt: lam(C.shirt), shorts: lam(C.shorts), shoe: lam(C.shoe),
+    sole: lam(0x5b544f), metal: lam(C.metal, { emissive: 0x15171a }) };
+  const add = (parent, geo, m, p = [0, 0, 0], s = [1, 1, 1], r = [0, 0, 0]) => {
+    const o = new THREE.Mesh(geo, m); o.position.set(...p); o.scale.set(...s); o.rotation.set(...r); parent.add(o); return o;
+  };
+  const rod = (parent, A, B, r, m, seg = 6) => {
+    A = new THREE.Vector3(...A); B = new THREE.Vector3(...B); const d = B.clone().sub(A);
+    const o = add(parent, new THREE.CylinderGeometry(r, r, d.length(), seg), m); o.position.copy(A).addScaledVector(d, 0.5);
+    o.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); return o;
+  };
+  const ball = (r, w = 8, h = 6) => new THREE.SphereGeometry(r, w, h);
+
+  const root = new THREE.Group(); root.rotation.y = 0.4; root.scale.setScalar(0.24); spin.add(root);
+  // beside the fridge; on narrow screens that's out of frame, so he stands in front of the freezer door's empty lower half
+  ali.place = narrow => narrow ? root.position.set(-0.2, 0, 0.62) : root.position.set(-0.8, 0, 0.22);
+  const body = new THREE.Group(); root.add(body);
+  const head = new THREE.Group(); head.position.set(0, 2.45, 0); body.add(head);
+
+  // painted face: equirect on the head sphere, front center at u = .25; a big open smile
+  const FW = 512, FH = 256, fc = document.createElement('canvas'); fc.width = FW; fc.height = FH; const f = fc.getContext('2d');
+  const U = lon => (0.25 + lon / 360) * FW, V = lat => (0.5 - lat / 180) * FH;
+  const poly = (pts, fill) => { f.beginPath(); pts.forEach(([lo, la], i) => i ? f.lineTo(U(lo), V(la)) : f.moveTo(U(lo), V(la))); f.closePath(); f.fillStyle = fill; f.fill(); };
+  const faceTex = new THREE.CanvasTexture(fc); faceTex.magFilter = THREE.LinearFilter;
+  function paintFace(closed) {
+    f.fillStyle = C.skin; f.fillRect(0, 0, FW, FH);
+    poly([[-180, 90], [180, 90], [180, 22], [60, 26], [38, 30], [22, 27], [8, 31], [-10, 28], [-26, 31], [-45, 26], [-70, 22], [-180, 22]], C.hair);
+    poly([[-180, -90], [180, -90], [180, 6], [90, 6], [78, -10], [60, -17], [42, -21], [26, -22], [12, -14], [0, -15], [-12, -14], [-26, -22], [-42, -21], [-60, -17], [-78, -10], [-90, 6], [-180, 6]], C.hair);
+    f.fillStyle = '#4a1f1a'; f.beginPath(); f.ellipse(U(0), V(-20), U(14) - U(0), 10, 0, 0, Math.PI); f.fill();   // big open smile
+    f.fillStyle = '#f7f1e6'; f.fillRect(U(-12), V(-20), U(12) - U(-12), 4);                                    // teeth
+    f.fillStyle = '#c86a5c'; f.beginPath(); f.ellipse(U(0), V(-20) + 8, U(7) - U(0), 3, 0, 0, Math.PI); f.fill();    // tongue
+    f.fillStyle = C.skinD; f.beginPath(); f.ellipse(U(0), V(-6), 9, 7, 0, 0, 7); f.fill();
+    [-1, 1].forEach(sd => {
+      const x = U(sd * 17), y = V(1);
+      f.fillStyle = 'rgba(190,90,70,.35)'; f.beginPath(); f.ellipse(U(sd * 26), V(-9), 12, 6, 0, 0, 7); f.fill();       // rosy cheeks
+      if (closed) { f.fillStyle = '#1a1412'; f.fillRect(x - 10, y + 1, 20, 3); }
+      else {
+        // smiling eyes: round, with the lower lid pushed up into a little arc
+        f.fillStyle = '#1a1412'; f.beginPath(); f.ellipse(x, y + 1, 9, 9, 0, 0, 7); f.fill();
+        f.fillStyle = '#fff'; f.fillRect(x + sd * -2 + 1, y - 2, 3, 3);
+        f.fillStyle = C.skin; f.beginPath(); f.ellipse(x, y + 12, 13, 6, 0, 0, 7); f.fill();
+      }
+      f.fillStyle = C.hair; f.save(); f.translate(U(sd * 18), V(15)); f.rotate(sd * -0.08); f.beginPath(); f.rect(-14, -4, 28, 8); f.fill(); f.restore();
+    });
+    faceTex.needsUpdate = true;
+  }
+  paintFace(false);
+
+  const HS = [1.08, 1, 1];
+  add(head, new THREE.SphereGeometry(1, 16, 12), lam(0xffffff, { map: faceTex }), [0, 0, 0], HS);
+  add(head, ball(0.15, 6, 5), M.skinD, [0, -0.12, 1.0], [1, 0.9, 0.9]);
+  [-1, 1].forEach(sd => add(head, ball(0.19, 6, 5), M.skin, [sd * 1.07, -0.04, 0], [0.5, 1, 0.75]));
+  // hair and beard: one sphere each, with vertices pulled inside the head where there's none
+  const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+  const mix = (a, b, t) => a + (b - a) * t;
+  const shell = (w, h, fn) => {
+    const g = new THREE.SphereGeometry(1, w, h), P = g.attributes.position, v = new THREE.Vector3();
+    for (let i = 0; i < P.count; i++) { v.fromBufferAttribute(P, i).normalize(); const o = fn(v); P.setXYZ(i, o.x, o.y, o.z); }
+    g.computeVertexNormals(); return g;
+  };
+  add(head, shell(26, 18, n => {
+    const yh = mix(-0.5, 0.52, sstep(-0.55, 0.55, n.z)) - 0.14 * Math.max(0, n.z) * Math.exp(-((n.x + 0.3) ** 2) / 0.02) - 0.05 * Math.max(0, n.z) * Math.exp(-((n.x - 0.25) ** 2) / 0.015);
+    const on = sstep(yh - 0.05, yh + 0.07, n.y), phi = Math.atan2(n.x, n.z);
+    let t = 0.1 + 0.14 * Math.max(0, n.y) + 0.07 * sstep(0.1, 0.7, Math.abs(n.x)) * sstep(-0.2, 0.5, n.y) + 0.025 * Math.sin(phi * 4 + n.y * 2.5);
+    const dx = n.x + 0.35, dy = n.y - 0.72, dz = n.z - 0.55; t += 0.12 * Math.exp(-(dx * dx + dy * dy + dz * dz) / 0.12);
+    const r = mix(0.93, 1 + t, on);
+    return new THREE.Vector3(n.x * r, n.y * r + 0.05, n.z * r);
+  }), M.hair, [0, 0, 0], HS);
+  add(head, shell(24, 16, n => {
+    const yb = mix(-0.1, -0.5, sstep(0.2, 0.75, n.z)), on = 1 - sstep(yb - 0.07, yb + 0.05, n.y);
+    const front = Math.max(0, n.z), low = sstep(-0.4, -1, n.y), t = 0.06 + 0.1 * front * low, r = mix(0.93, 1 + t, on);
+    return new THREE.Vector3(n.x * r, n.y * r - 0.18 * front * low * on, n.z * r + 0.06 * front * low * on);
+  }), M.hair, [0, 0, 0.01], HS);
+  add(head, new THREE.TorusGeometry(0.15, 0.055, 6, 14, Math.PI), M.hair, [0, -0.33, 0.97], [1.25, 1, 0.6], [-0.15, 0, 0]);
+
+  // wire glasses
+  const gr = 0.215, gz = 1.06, gy = 0.02, gx = 0.335, tube = 0.026;
+  [-1, 1].forEach(sd => {
+    add(head, new THREE.TorusGeometry(gr, tube, 4, 12), M.metal, [sd * gx, gy, gz], [1, 1, 1], [0, 0, Math.PI / 12]);
+    const edge = [sd * (gx + gr - 0.01), gy + 0.03, gz], hinge = [sd * 0.98, gy + 0.04, 0.62], ear = [sd * 1.1, gy, -0.02];
+    rod(head, edge, hinge, tube * 0.85, M.metal, 4); rod(head, hinge, ear, tube * 0.85, M.metal, 4);
+  });
+  rod(head, [-(gx - gr - 0.01), gy + 0.06, gz], [0, gy + 0.11, gz + 0.02], tube * 0.85, M.metal, 4);
+  rod(head, [0, gy + 0.11, gz + 0.02], [gx - gr - 0.01, gy + 0.06, gz], tube * 0.85, M.metal, 4);
+
+  // gem-print shirt (cylinder front at u = .5 via thetaStart = PI)
+  const shirtTex = canvasTex(256, 128, (s, SW) => {
+    s.fillStyle = C.shirt; s.fillRect(0, 0, SW, 128);
+    const gemC = ['#b85f3c', '#4f8a7f', '#4a4542', '#c9867a', '#7b6b5f', '#5d8fb0', '#a3433a', '#6f8a63', '#d2a35e'];
+    const gx0 = SW * 0.5 - 30, gy0 = 36;
+    gemC.forEach((c, i) => {
+      const x = gx0 + (i % 3) * 14, y = gy0 + Math.floor(i / 3) * 14, n = 5 + (i % 4);
+      s.beginPath(); for (let k = 0; k < n; k++) { const a = k / n * Math.PI * 2 + i, rr = 5 + (k % 2) * 1.2; s.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr * 1.2); }
+      s.closePath(); s.fillStyle = c; s.fill();
+    });
+  });
+  // torso with one rounded dome for the shoulders, sleeves running along each arm
+  add(body, new THREE.CylinderGeometry(0.56, 0.7, 1.0, 12, 1, false, Math.PI, Math.PI * 2), lam(0xffffff, { map: shirtTex }), [0, 1.06, 0], [1, 1, 0.8]);
+  add(body, new THREE.SphereGeometry(0.56, 12, 4, 0, Math.PI * 2, 0, Math.PI / 2), M.shirt, [0, 1.56, 0], [1, 0.34, 0.8]);
+  add(body, new THREE.CylinderGeometry(0.2, 0.22, 0.3, 8), M.skin, [0, 1.7, -0.02]);
+  const arm = (from, to, sleeve) => {
+    rod(body, from, to, 0.11, M.skin, 7);
+    const s = from.map((v, k) => v + (to[k] - v) * sleeve);
+    rod(body, from, s, 0.17, M.shirt, 8);
+    add(body, ball(0.17, 8, 5), M.shirt, from);
+  };
+  // arm toward the fridge hangs down
+  arm([0.52, 1.44, 0], [0.8, 0.76, 0.05], 0.4);
+  add(body, ball(0.14, 7, 5), M.skin, [0.82, 0.68, 0.06], [1, 1.1, 0.9]);
+  // the other one waves, held out past his head: the forearm swings from the elbow
+  arm([-0.52, 1.44, 0], [-1.22, 1.66, 0.1], 0.4);
+  add(body, ball(0.11, 7, 5), M.skin, [-1.22, 1.66, 0.1]);
+  const forearm = new THREE.Group(); forearm.position.set(-1.22, 1.66, 0.1); body.add(forearm);
+  rod(forearm, [0, 0, 0], [-0.14, 0.5, 0.03], 0.105, M.skin, 7);
+  add(forearm, ball(0.15, 8, 5), M.skin, [-0.18, 0.64, 0.04], [1, 1.15, 0.75], [0, 0, 0.25]);
+
+  // shorts, legs, shoes
+  add(body, new THREE.CylinderGeometry(0.66, 0.6, 0.32, 10), M.shorts, [0, 0.46, 0], [1, 1, 0.8]);
+  [-1, 1].forEach(sd => {
+    add(body, new THREE.CylinderGeometry(0.25, 0.23, 0.22, 8), M.shorts, [sd * 0.28, 0.3, 0]);
+    add(body, new THREE.CylinderGeometry(0.12, 0.12, 0.2, 6), M.skin, [sd * 0.28, 0.16, 0]);
+    add(body, ball(0.2, 8, 5), M.shoe, [sd * 0.28, 0.07, 0.07], [0.9, 0.55, 1.25]);
+    add(body, new THREE.CylinderGeometry(0.19, 0.19, 0.04, 8), M.sole, [sd * 0.28, 0.02, 0.07], [0.95, 1, 1.3]);
+  });
+  const blob = new THREE.Mesh(new THREE.CircleGeometry(1, 12), basic(0x000000, { transparent: true, opacity: 0.18, depthWrite: false }));
+  blob.rotation.x = -Math.PI / 2; blob.position.y = 0.004; blob.scale.set(1.0, 0.75, 1); root.add(blob);
+
+  let nextBlink = 2, blinking = false;
+  ali.update = t => {
+    forearm.rotation.z = reduceMotion ? 0.15 : 0.15 + Math.sin(t * 7) * 0.45;
+    if (!reduceMotion) { body.position.y = Math.abs(Math.sin(t * 2)) * 0.03; head.rotation.z = Math.sin(t * 1.1) * 0.04; }
+    const bl = t > nextBlink && t < nextBlink + 0.14;
+    if (t > nextBlink + 0.14) nextBlink = t + 2.5 + Math.random() * 3;
+    if (bl !== blinking) { blinking = bl; paintFace(bl); }
+  };
+}
+
 /* ------------------------------------------------------------------ fridge items */
 const manager = new THREE.LoadingManager();
 const loader = new THREE.TextureLoader(manager);
@@ -553,7 +872,7 @@ function remapUV(g, w, h) {
 
 for (const it of ITEMS) {
   const w = it.w / 1000, h = it.h / 1000;
-  const tex = loader.load(it.lo, t => {
+  const tex = loader.load(it.tex || it.lo, t => {
     if (it.cover) {
       // crop to the spot's shape on the fridge; the lightbox shows the whole image
       const ia = t.image.width / t.image.height, sa = it.w / it.h;
@@ -569,13 +888,13 @@ for (const it of ITEMS) {
   group.rotation.z = -it.a * Math.PI / 180;
   group.visible = false; // pops in once its texture arrives
   fridge.add(group);
-  const face = lam(0xffffff, { map: tex, alphaTest: it.lo.endsWith('.png') ? 0.4 : 0 });
+  const face = lam(0xffffff, { map: tex, alphaTest: !it.tex && it.lo.endsWith('.png') ? 0.4 : 0 });
   let mesh, shadowGeo;
   if (it.thick) {
     const shapes = itemShapes(it, w, h), depth = it.thick / 1000;
     const g = new THREE.ExtrudeGeometry(shapes, { depth, bevelEnabled: false, curveSegments: it.shape === 'rect' ? 2 : 5 });
     remapUV(g, w, h);
-    mesh = new THREE.Mesh(g, [face, lam(it.id === 'usgs' ? 0x8e8a80 : 0x3b3530, { flatShading: true })]);
+    mesh = new THREE.Mesh(g, [face, lam(it.edge ?? (it.id === 'usgs' ? 0x8e8a80 : 0x3b3530), { flatShading: true })]);
     shadowGeo = new THREE.ShapeGeometry(shapes, 4);
   } else {
     mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, h), face);
@@ -587,6 +906,24 @@ for (const it of ITEMS) {
   shadow.position.set(0.0018, -0.0026, -0.0004); shadow.renderOrder = -1;
   group.add(shadow);
   entries.push({ it, group, mesh, shadow, lift: 0, liftTo: 0, home: { p: group.position.clone(), q: group.quaternion.clone(), s: 1 } });
+}
+// label-maker tape at the top of each door: which side is work and which is personal
+for (const side of Object.values(SIDES)) {
+  const px = 64, pad = 30, track = px * 0.25, c = document.createElement('canvas'), g = c.getContext('2d');
+  const font = `${px}px Silkscreen, "Courier New", monospace`;
+  g.font = font;
+  c.width = Math.ceil(g.measureText(side.label).width + track * (side.label.length - 1) + pad * 2); c.height = Math.round(px * 1.6);
+  g.fillStyle = side.color; g.fillRect(0, 0, c.width, c.height);
+  g.fillStyle = 'rgba(255,255,255,.12)'; g.fillRect(0, 0, c.width, c.height * 0.35);
+  g.font = font; g.textBaseline = 'middle';
+  if ('letterSpacing' in g) g.letterSpacing = track + 'px';
+  // embossed letters: a dark offset under bright white
+  g.fillStyle = 'rgba(0,0,0,.35)'; g.fillText(side.label, pad + 2, c.height / 2 + 4);
+  g.fillStyle = '#ffffff'; g.fillText(side.label, pad, c.height / 2 + 2);
+  const tex = new THREE.CanvasTexture(c); tex.magFilter = THREE.LinearFilter;
+  const h = 0.052, w = h * c.width / c.height, x = (side.spots[0].cx - 430) / 1000, edge = lam(side.color);
+  const tape = box(w, h, 0.0015, [edge, edge, edge, edge, lam(0xffffff, { map: tex }), edge], x, DOOR_TOP - LABEL_Y / 1000, FRONT_Z + 0.001, fridge);
+  tape.rotation.z = side.door === 'left' ? 0.012 : -0.012;
 }
 // little round magnets, the bar magnet, the binder clip
 for (const [x, y] of DATA.dots) {
@@ -737,14 +1074,15 @@ mergeGuests(); loadGuests();
 document.fonts && document.fonts.ready.then(() => Promise.all([document.fonts.load('40px "Titan One"'), document.fonts.load('800 20px Nunito')])).then(layoutGuests).catch(() => {});
 
 /* ------------------------------------------------------------------ camera rig + input */
-const rig = { ease: 7, yaw: 0, yawVel: 0, yawTo: null, pitch: 0.1, dist: 7, distTo: 3.9, target: new THREE.Vector3(0, 1.06, 0), home: new THREE.Vector3(0, 1.06, 0), minD: 0.75, maxD: 5.2 };
+const rig = { ease: 7, yaw: 0, yawVel: 0, yawTo: null, pitch: 0.1, dist: 7, distTo: 3.9, target: new THREE.Vector3(0, 1.0, 0), home: new THREE.Vector3(0, 1.0, 0), minD: 0.75, maxD: 5.2 };
 let mode = 'explore';      // explore | lightbox | modal
 const RES = 480;            // render height in lines
 
 function fitDistance() {
   const vf = THREE.MathUtils.degToRad(camera.fov) / 2;
   const hf = Math.atan(Math.tan(vf) * camera.aspect);
-  return Math.max(1.02 / Math.tan(vf), 0.66 / Math.tan(hf));
+  // tall enough to keep Ali's feet in view, wide enough for the fridge
+  return Math.max(1.12 / Math.tan(vf), 0.66 / Math.tan(hf));
 }
 function resize() {
   if (!renderer) return;
@@ -753,6 +1091,7 @@ function resize() {
   const w = Math.max(2, Math.round(h * cw / ch));
   renderer.setSize(w, h, false); rt.setSize(w, h);
   camera.aspect = cw / ch; camera.updateProjectionMatrix();
+  ali.place(camera.aspect < 0.9);
   const fit = fitDistance();
   rig.maxD = fit * 1.35; rig.homeD = fit;
   rig.distTo = Math.min(rig.distTo, rig.maxD);
@@ -851,6 +1190,12 @@ function clickAt(x, y) {
 addEventListener('keydown', e => {
   if (e.target.closest && e.target.closest('input, textarea') && e.key !== 'Escape') return;
   lastInput = performance.now();
+  if (mode === 'project') {
+    if (e.key === 'Escape') closeProject();
+    else if (e.key === 'ArrowRight') stepProject(1);
+    else if (e.key === 'ArrowLeft') stepProject(-1);
+    return;
+  }
   if (mode === 'lightbox') {
     if (e.key === 'Escape') closeLightbox();
     else if (e.key === 'ArrowRight') stepLightbox(1);
@@ -909,6 +1254,7 @@ function fillLightbox(src, lo, title, meta, num, aspect, natW) {
   if (!reduceMotion) { frame.classList.add('pop'); requestAnimationFrame(() => requestAnimationFrame(() => frame.classList.remove('pop'))); }
 }
 function openItem(i) {
+  if (entries[i].it.project) { openProject(i); return; }
   if (mode === 'modal') { $('#list').classList.remove('show'); $('#list').hidden = true; openModalEl = null; lastFocus = canvas; }
   setHover(-1);
   const e = entries[i], it = e.it;
@@ -936,7 +1282,11 @@ function openVisitor(vi) {
 }
 function stepLightbox(d) {
   if (currentVisitor >= 0) { openVisitor((currentVisitor + d + guests.length) % guests.length); return; }
-  openItem((current + d + entries.length) % entries.length);
+  // pictures only; projects step through their own cards
+  for (let k = 1; k <= entries.length; k++) {
+    const i = (current + d * k + entries.length * k) % entries.length;
+    if (!entries[i].it.project) { openItem(i); return; }
+  }
 }
 function closeLightbox() {
   if (mode !== 'lightbox') return;
@@ -978,6 +1328,52 @@ function updateFlight(dt) {
   e.shadow.visible = f.t < 0.05;
   if (f.dir < 0 && f.t === 0) { e.group.position.copy(e.home.p); e.group.quaternion.copy(e.home.q); e.group.scale.setScalar(1); e.shadow.visible = true; flying = null; }
 }
+
+/* ------------------------------------------------------------------ project card */
+const pj = $('#project');
+const projectIdx = () => entries.map((e, i) => e.it.project ? i : -1).filter(i => i >= 0);
+function openProject(i) {
+  if (mode === 'modal') { $('#list').classList.remove('show'); $('#list').hidden = true; openModalEl = null; lastFocus = canvas; }
+  setHover(-1); sendHome(true);
+  current = i; currentVisitor = -1;
+  flyOut(entries[i]);
+  const wasOpen = mode === 'project';
+  mode = 'project';
+  const show = () => {
+    if (!wasOpen) showModalEl(pj);
+    fillProject(i);
+    if (!wasOpen) $('#pjClose').focus({ preventScroll: true });
+  };
+  if (wasOpen || reduceMotion) show(); else setTimeout(show, 260);
+}
+function fillProject(i) {
+  const it = entries[i].it, p = it.project, list = projectIdx(), k = list.indexOf(i), n = list.length;
+  const el = (tag, text) => { const x = document.createElement(tag); x.textContent = text; return x; };
+  $('#pjIcon').src = it.hi;
+  $('#pjSide').textContent = p.side === 'personal' ? 'PERSONAL PROJECT' : 'WORK'; $('#pjSide').dataset.side = p.side || 'work';
+  $('#pjTitle').textContent = it.title;
+  $('#pjRole').textContent = p.role || '';
+  $('#pjMeta').textContent = [p.dates, p.place].filter(Boolean).join(' · ');
+  $('#pjSummary').textContent = p.summary || ''; $('#pjSummary').hidden = !p.summary;
+  for (const [id, items] of [['#pjPoints', p.points], ['#pjTags', p.tags]]) {
+    const ul = $(id); ul.replaceChildren(...(items || []).map(t => el('li', t))); ul.hidden = !ul.childElementCount;
+  }
+  $('#pjLinks').replaceChildren(...(p.links || []).map(l => { const a = el('a', l.label + ' ↗'); a.href = l.href; a.target = '_blank'; a.rel = 'noopener'; return a; }));
+  const prev = entries[list[(k - 1 + n) % n]].it.title, next = entries[list[(k + 1) % n]].it.title;
+  $('#pjPrev').textContent = '‹ ' + prev; $('#pjPrev').setAttribute('aria-label', 'Previous: ' + prev);
+  $('#pjNext').textContent = next + ' ›'; $('#pjNext').setAttribute('aria-label', 'Next: ' + next);
+  $('#pjNum').textContent = `${k + 1} / ${n}`;
+  pj.querySelector('.project').scrollTop = 0;
+}
+function stepProject(d) { const list = projectIdx(), k = list.indexOf(current); openProject(list[(k + d + list.length) % list.length]); }
+function closeProject() {
+  if (mode !== 'project') return;
+  hideModalEl(pj); mode = 'explore'; sendHome(false);
+}
+$('#pjClose').addEventListener('click', closeProject);
+$('#pjPrev').addEventListener('click', () => stepProject(-1));
+$('#pjNext').addEventListener('click', () => stepProject(1));
+pj.addEventListener('click', e => { if (e.target === pj) closeProject(); });
 
 /* ------------------------------------------------------------------ list view */
 function openList() {
@@ -1131,6 +1527,7 @@ function frame(now) {
   // ambient life
   clouds.rotation.y = t * 0.006;
   for (const p of plantLeaves) p.leaf.rotation.y = Math.sin(t * 0.9 + p.ph) * 0.05;
+  ali.update(t);
 
   renderer.setRenderTarget(rt); renderer.render(scene, camera);
   renderer.setRenderTarget(null); renderer.render(postScene, postCam);
