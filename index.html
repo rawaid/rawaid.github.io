@@ -5,7 +5,7 @@
 <meta name="description" content="Rawaid Akhtar's portfolio, stuck to a fridge.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titan+One&family=Silkscreen&family=Nunito:wght@600;800&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Titan+One&family=Silkscreen&family=Nunito:wght@400;600;800&display=swap">
 <style>
 /* Layout: one full-bleed 3D stage; HUD pinned to the corners like a cartridge game's overlay.
    Single deliberate look (sky-blue world, almond-fridge cream, ink dialog boxes) in every theme. */
@@ -83,32 +83,48 @@ button{font:inherit;color:inherit}
 .sheet .x{position:sticky;top:0;float:right;margin:-4px -4px 0 0}
 .sheet .x.icon-btn{position:sticky}
 
-/* project card */
-.project{position:relative;width:min(720px,100%);max-height:100%;overflow:auto;box-sizing:border-box;background:var(--cream);color:var(--ink);border:4px solid var(--ink);border-radius:18px;box-shadow:0 8px 0 var(--ink);padding:22px 24px 18px;transform:translateY(10px) scale(.98);transition:transform .3s cubic-bezier(.2,1.3,.4,1)}
-.modal.show .project{transform:none}
-.project .icon-btn{top:14px;right:14px}
-.pj-head{display:grid;grid-template-columns:112px minmax(0,1fr);gap:18px;align-items:center;margin-right:50px}
-.pj-head img{width:112px;height:112px;object-fit:contain;filter:drop-shadow(0 4px 0 rgba(28,26,53,.2))}
-.pj-side{display:inline-block;margin:0 0 8px;padding:3px 8px 2px;border:2px solid var(--ink);border-radius:6px;background:var(--ink);color:#fff;font-family:var(--f-pixel);font-size:11px;letter-spacing:.08em}
-.pj-side[data-side="personal"]{background:var(--tomato)}
-.project h2{margin:0;font-family:var(--f-display);font-weight:400;font-size:clamp(26px,4vw,34px);line-height:1.05;letter-spacing:.01em;text-wrap:balance}
-.pj-role{margin:6px 0 0;font-size:18px;font-weight:800}
-.pj-meta{margin:2px 0 0;font-size:15px;font-weight:600;color:#5d5872}
-.pj-role:empty,.pj-meta:empty,.pj-links:empty{display:none}
-.pj-body{margin-top:18px;font-size:17px;line-height:1.55;font-weight:600}
-.pj-body p{margin:0 0 12px;max-width:62ch}
-.pj-body ul{margin:0 0 14px;padding-left:1.25em;max-width:62ch}
-.pj-body li{margin:0 0 6px;padding-left:2px}
-.pj-body li::marker{color:var(--tomato)}
-.pj-body .pj-tags{display:flex;flex-wrap:wrap;gap:6px;list-style:none;padding:0;margin:4px 0 14px}
-.pj-tags li{margin:0;padding:4px 8px 3px;background:#fff;border:2px solid var(--ink);border-radius:7px;font-family:var(--f-pixel);font-size:11px;letter-spacing:.04em}
-.pj-links{display:flex;flex-wrap:wrap;gap:8px}
-.pj-links a{font-family:var(--f-display);font-size:15px;letter-spacing:.02em;color:var(--ink);background:var(--sun);border:3px solid var(--ink);border-radius:10px;padding:5px 12px 6px;box-shadow:0 3px 0 var(--ink);text-decoration:none}
-.pj-links a:hover{background:#ffd866}
-.pj-links a:focus-visible{outline:3px solid var(--tomato);outline-offset:3px}
-.pj-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:8px;padding-top:14px;border-top:2px dashed rgba(28,26,53,.25)}
-.pj-foot .pill{font-size:14px;padding:5px 12px 6px;max-width:42%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.pj-foot .num{font-family:var(--f-pixel);font-size:11px;color:#5d5872;font-variant-numeric:tabular-nums}
+/* project note: an index card pinned under the magnet, with the 3D scene live behind it.
+   White with blue rules, because cream belongs to the fridge. Every text line is 28px so it sits on the rules. */
+.note{position:fixed;inset:0;z-index:20;pointer-events:none;--rest:-1.2deg;--left:0px;--top:0px;--width:520px}
+.note-card,.note-back{position:absolute;left:var(--left);top:var(--top);width:var(--width);box-sizing:border-box;transform:rotate(var(--rest));transform-origin:50% 0}
+.note-card{max-height:calc(100vh - var(--top) - 24px);max-height:calc(100dvh - var(--top) - 24px);overflow-y:auto;overscroll-behavior:contain;padding:84px 34px 28px 40px;pointer-events:auto;color:#1f1c3d;
+  background:linear-gradient(#fdfdfc,#fdfdfc) 0 0/100% 71px no-repeat,linear-gradient(rgba(239,74,63,.6),rgba(239,74,63,.6)) 0 71px/100% 2px no-repeat,repeating-linear-gradient(transparent 0 27px,#d4e3f6 27px 28px),#fdfdfc;
+  background-attachment:local;box-shadow:0 22px 44px rgba(20,30,60,.3),0 2px 0 rgba(0,0,0,.05)}
+.note-back{display:none}
+.note-chip{position:absolute;left:32px;top:24px;margin:0;padding:5px 9px;border-radius:4px;background:#1f1c3d;color:#fff;font:400 10px/1 var(--f-pixel);letter-spacing:2px;text-transform:uppercase}
+.note-chip[data-side="personal"]{background:#ef4a3f}
+.note-put{position:absolute;right:20px;top:13px;min-height:32px;padding:0 8px;background:none;border:0;color:#6b6987;font:400 10px/1 var(--f-pixel);letter-spacing:1px;cursor:pointer}
+.note-put:hover{color:#1f1c3d}
+.note-put:focus-visible,.note-links a:focus-visible{outline:2px solid #1f1c3d;outline-offset:2px}
+.note-put .ph{display:none}
+.note-title{margin:0;font:400 36px/56px var(--f-display);color:#1f1c3d;outline:none}
+.note-meta{margin:0;font-size:13.5px;line-height:28px;font-weight:400;color:#3a3858}
+.note-meta strong{font-weight:600;color:#1f1c3d}
+.note-headline{margin:0;font-size:16px;line-height:28px;font-weight:600;color:#1f1c3d}
+.note-headline span{background:linear-gradient(transparent 38%,rgba(245,192,64,.6) 38% 88%,transparent 88%);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.note-bullets{margin:0;padding:0;list-style:none;font-size:13.5px;line-height:28px;font-weight:400;color:#2c2a48}
+.note-bullets li{display:flex;gap:10px}
+.note-bullets li::before{content:"—";flex:none}
+.note-stack{margin:0;font:400 10.5px/28px var(--f-pixel);letter-spacing:1px;text-transform:uppercase;color:#55537a}
+.note-links{margin:0;font-size:14px;line-height:28px;font-weight:600}
+.note-links a{color:#1f1c3d;text-decoration-thickness:2px;text-underline-offset:4px;margin-right:16px}
+.note-card.waiting{opacity:0;pointer-events:none}
+.note-card.dropping{animation:noteDrop .38s cubic-bezier(.34,1.56,.64,1) both}
+.note-card.lifting{animation:noteLift .18s ease-in both;pointer-events:none}
+.note-card.closing{animation:noteLift .2s ease-in both;pointer-events:none}
+.note-card.fading .note-inner{animation:noteFade .22s ease-out both}
+@keyframes noteDrop{from{transform:translateY(-24px) rotate(-5deg);opacity:0}to{transform:rotate(var(--rest));opacity:1}}
+@keyframes noteLift{to{transform:translateY(-16px) rotate(-4deg);opacity:0}}
+@keyframes noteFade{from{opacity:0}to{opacity:1}}
+@keyframes noteFadeOut{to{opacity:0}}
+.note-pin{position:fixed;left:0;top:0;z-index:21;pointer-events:none;will-change:transform}
+.note-pin img{display:block;width:100%;height:auto;filter:drop-shadow(0 6px 6px rgba(0,0,0,.25))}
+.note-pin img.snap{animation:noteSnap .16s ease-out}
+@keyframes noteSnap{from{transform:scale(1.08)}to{transform:scale(1)}}
+.note-hint{position:fixed;right:24px;bottom:22px;z-index:22;margin:0;padding:8px 12px;background:#1f1c3d;color:#fff;font:400 10px/1 var(--f-pixel);letter-spacing:1px;border-radius:6px;pointer-events:none}
+/* transparent stand-ins for the 3D magnets, so a keyboard or screen reader can reach them; pointers go to the canvas */
+.magnet-btn{position:fixed;left:0;top:0;z-index:4;padding:0;background:none;border:0;border-radius:12px;pointer-events:none}
+.magnet-btn:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
 
 /* leave a photo */
 .card{width:min(420px,100%);background:var(--cream);color:var(--ink);border:4px solid var(--ink);border-radius:18px;box-shadow:0 8px 0 var(--ink);padding:22px 20px;display:grid;gap:12px;text-align:center}
@@ -138,13 +154,30 @@ button{font:inherit;color:inherit}
   .grid{grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
   .thumb{grid-template-rows:110px auto}
   .thumb img{max-height:110px}
-  .project{padding:18px 16px 14px}
-  .pj-head{grid-template-columns:72px minmax(0,1fr);gap:12px;margin-right:46px}
-  .pj-head img{width:72px;height:72px}
-  .pj-body{font-size:16px}
+  /* the note becomes a full-width deck: bleeds off the bottom, next card peeking behind */
+  .note{--rest:-1deg}
+  .note-card,.note-back{left:12px;right:12px;width:auto;height:calc(100vh - var(--top) + 40px);height:calc(100dvh - var(--top) + 40px)}
+  .note-card{max-height:none;padding:84px 22px calc(68px + env(safe-area-inset-bottom,0px)) 26px;touch-action:pan-y}
+  .note-back{display:block;background:repeating-linear-gradient(transparent 0 27px,#d4e3f6 27px 28px),#f6f7f8;box-shadow:0 10px 24px rgba(20,30,60,.18);transform:translate(10px,12px) rotate(2.5deg);transition:transform .3s ease-out}
+  .note-back.forward{transform:rotate(var(--rest))}
+  .note-chip{left:22px;padding:5px 8px;font-size:9px}
+  .note-put{font-size:9px}
+  .note-put .ph{display:inline}
+  .note-put .desk{display:none}
+  .note-title{font-size:30px}
+  .note-meta{font-size:13px}
+  .note-meta strong{display:block}
+  .note-meta .sep{display:none}
+  .note-headline{font-size:15px}
+  .note-bullets{font-size:13px}
+  .note-stack{font-size:9.5px}
+  .note-hint{display:none}
 }
 @media (prefers-reduced-motion:reduce){
-  .modal,.lb-frame img,.project{transition:none}
+  .modal,.lb-frame img,.note-back{transition:none}
+  .note-card.dropping,.note-card.fading .note-inner{animation:noteFade .15s linear both}
+  .note-card.lifting,.note-card.closing{animation:noteFadeOut .15s linear both}
+  .note-pin img.snap{animation:none}
 }
 </style>
 
@@ -176,31 +209,23 @@ button{font:inherit;color:inherit}
   </div>
 </div>
 
-<div id="project" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="pjTitle">
-  <article class="project">
-    <button class="icon-btn" id="pjClose" type="button" aria-label="Close">✕</button>
-    <header class="pj-head">
-      <img id="pjIcon" alt="">
-      <div>
-        <p class="pj-side" id="pjSide"></p>
-        <h2 id="pjTitle"></h2>
-        <p class="pj-role" id="pjRole"></p>
-        <p class="pj-meta" id="pjMeta"></p>
-      </div>
-    </header>
-    <div class="pj-body">
-      <p id="pjSummary"></p>
-      <ul id="pjPoints"></ul>
-      <ul class="pj-tags" id="pjTags" aria-label="Tools"></ul>
-      <p class="pj-links" id="pjLinks"></p>
+<div id="note" class="note" hidden>
+  <div class="note-back" id="noteBack" aria-hidden="true"></div>
+  <article class="note-card" id="noteCard" role="dialog" aria-modal="false" aria-labelledby="noteTitle">
+    <div class="note-inner">
+      <p class="note-chip" id="noteChip"></p>
+      <button class="note-put" id="notePut" type="button" aria-label="Put the card back"><span class="desk">PUT BACK ✕</span><span class="ph">PULL DOWN ↓</span></button>
+      <h2 class="note-title" id="noteTitle" tabindex="-1"></h2>
+      <p class="note-meta" id="noteMeta"></p>
+      <p class="note-headline"><span id="noteHeadline"></span></p>
+      <ul class="note-bullets" id="noteBullets"></ul>
+      <p class="note-stack" id="noteStack"></p>
+      <p class="note-links" id="noteLinks"></p>
     </div>
-    <footer class="pj-foot">
-      <button class="pill" id="pjPrev" type="button"></button>
-      <span class="num" id="pjNum"></span>
-      <button class="pill" id="pjNext" type="button"></button>
-    </footer>
   </article>
 </div>
+<div class="note-pin" id="notePin" hidden><img id="noteSprite" alt=""></div>
+<p class="note-hint" id="noteHint" hidden>CLICK THE FRIDGE OR ESC TO PUT IT BACK</p>
 
 <div id="list" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="listTitle">
   <div class="sheet">
@@ -252,44 +277,39 @@ button{font:inherit;color:inherit}
 <script>
 /* Portfolio pieces: work on the freezer door (left), personal projects on the fridge door (right),
    top to bottom in the order listed. Each is a die-cut magnet of its low-poly icon (made by
-   tools/icons.html); clicking one opens its project card. Without an icon a piece gets a title card
-   instead, and img: "img/portfolio/<file>" shows a screenshot card.
-   Card fields: role, dates, place, summary, points (bullets), tags, links ({ label, href }). */
+   tools/icons.html); clicking one pins its index card under it. Without an icon a piece gets a title
+   card instead, and img: "img/portfolio/<file>" shows a screenshot card.
+   Card fields: slug (the URL hash), role, dates, place, headline (the one outcome to lead with),
+   bullets (3 at most), stack, links ({ label, href }). */
 const PORTFOLIO = [
-  { side: 'work', title: 'FanDuel', icon: 'img/portfolio/icon-dice.png',
-    role: 'Senior Software Engineer', dates: 'May 2018 – present', place: 'New York, NY',
-    summary: "I lead frontend development for FanDuel's Fantasy and Sportsbook products, on the web with React and Redux and in the React Native app.",
-    points: [
-      'Led a React Native architecture modernization, upgrading the app from 0.71 to 0.81.5 in about six months, including adopting Fabric.',
-      'Improved build stability, performance and long-term maintainability while keeping parallel feature work unblocked.',
-      'Scaled the Sanity CMS setup that powers the dynamic homepage layouts content operations uses every day.',
-      'Manage and mentor frontend engineers, and lead hiring through interviews and onboarding.',
-      'Use AI-assisted tools like Cursor and Claude for refactors, test generation and getting around the codebase.',
+  { slug: 'fanduel', side: 'work', title: 'FanDuel', icon: 'img/portfolio/icon-dice.png',
+    role: 'Senior Software Engineer', dates: 'May 2018 – present', place: 'New York',
+    headline: 'Took the React Native app from 0.71 → 0.81.5, Fabric included, in about six months.',
+    bullets: [
+      'Lead frontend for Fantasy + Sportsbook, web and app.',
+      'Scaled the Sanity CMS behind the dynamic homepage layouts.',
+      'Manage and mentor frontend engineers; run hiring.',
     ],
-    tags: ['React', 'React Native', 'Redux', 'TypeScript', 'Fabric', 'Sanity CMS'],
+    stack: ['React', 'RN', 'Redux', 'TS', 'Fabric', 'Sanity'],
     links: [{ label: 'fanduel.com', href: 'https://www.fanduel.com' }] },
-  { side: 'work', title: 'NBA', icon: 'img/portfolio/icon-basketball.png',
-    role: 'UI Developer', dates: 'Nov 2015 – Jan 2018', place: 'New York, NY',
-    summary: 'I built UI for stats.nba.com and related NBA properties: data-heavy pages that a lot of people use.',
-    points: [
-      'Built and maintained data-heavy, high-traffic UI features for stats.nba.com and related properties.',
-      'Worked across teams to ship frontend that was fast and reliable.',
-    ],
+  { slug: 'nba', side: 'work', title: 'NBA', icon: 'img/portfolio/icon-basketball.png',
+    role: 'UI Developer', dates: 'Nov 2015 – Jan 2018', place: 'New York',
+    headline: 'Built data-heavy, high-traffic UI for stats.nba.com and related properties.',
+    bullets: ['Worked across teams to ship frontend that was fast and reliable.'],
+    stack: ['AngularJS', 'WordPress'],
     links: [{ label: 'stats.nba.com', href: 'https://www.nba.com/stats' }] },
-  { side: 'personal', title: 'Perfect Eater Radio', icon: 'img/portfolio/icon-headphones.png',
+  { slug: 'perfect-eater-radio', side: 'personal', title: 'Perfect Eater Radio', icon: 'img/portfolio/icon-headphones.png',
     role: 'Founder & Engineer', dates: '2025 – present',
-    // draft from the resume until Ali's own write-up is in
-    summary: 'A self-hosted internet radio station, built and run end to end.',
-    points: [
-      'Runs on a DigitalOcean droplet: MediaMTX takes the RTMP stream in and serves HLS, with Caddy as the HTTPS reverse proxy.',
-      'The frontend is React and TypeScript, with HLS.js for live playback, Motion for animation, a custom morphing SVG logo and an animated listener count.',
-      'A middleware adapter on Railway reports real-time stream status, and a flat archive holds 55+ recorded shows.',
-      'Every infrastructure call is mine: stream ingest, CDN setup, playback race conditions and the OBS audio pipeline on macOS.',
+    headline: "An internet radio station I've spent the last year on, and we're nearing our 100th episode!",
+    bullets: [
+      'Everyone gets an avatar in a 2D zone, where you can chat while live shows happen.',
+      'MediaMTX takes the RTMP stream in and serves HLS, behind Caddy on a DigitalOcean droplet.',
+      'Every infrastructure call is mine, from stream ingest to the OBS audio pipeline.',
     ],
-    tags: ['React', 'TypeScript', 'HLS.js', 'MediaMTX', 'Caddy', 'DigitalOcean'],
+    stack: ['React', 'TS', 'HLS.js', 'MediaMTX', 'Caddy', 'DigitalOcean'],
     links: [{ label: 'perfecteater.com', href: 'https://perfecteater.com' }] },
-  { side: 'personal', title: 'Fourth Place Engineering', icon: 'img/portfolio/icon-rosette.png',
-    summary: 'Write-up coming soon.' },
+  { slug: 'fourth-place-engineering', side: 'personal', title: 'Fourth Place Engineering', icon: 'img/portfolio/icon-rosette.png',
+    headline: 'Write-up coming soon.' },
 ];
 // start the icons loading now; the magnets are cut once they arrive
 for (const p of PORTFOLIO) if (p.icon) { p.iconImg = new Image(); p.iconImg.src = p.icon; }
@@ -717,7 +737,11 @@ const ali = {};
 
   const root = new THREE.Group(); root.rotation.y = 0.4; root.scale.setScalar(0.24); spin.add(root);
   // beside the fridge; on narrow screens that's out of frame, so he stands in front of the freezer door's empty lower half
-  ali.place = narrow => narrow ? root.position.set(-0.2, 0, 0.62) : root.position.set(-0.8, 0, 0.22);
+  ali.place = narrow => {
+    // no room beside the fridge on a phone, so he stands smaller in front of the freezer door, clear of the magnets
+    root.position.set(...(narrow ? [-0.2, 0, 0.5] : [-0.8, 0, 0.22]));
+    root.scale.setScalar(narrow ? 0.17 : 0.24);
+  };
   const body = new THREE.Group(); root.add(body);
   const head = new THREE.Group(); head.position.set(0, 2.45, 0); body.add(head);
 
@@ -1077,12 +1101,14 @@ document.fonts && document.fonts.ready.then(() => Promise.all([document.fonts.lo
 
 /* ------------------------------------------------------------------ camera rig + input */
 const rig = { ease: 7, yaw: 0, yawVel: 0, yawTo: null, pitch: 0.1, dist: 7, distTo: 3.9, target: new THREE.Vector3(0, 1.0, 0), home: new THREE.Vector3(0, 1.0, 0), minD: 0.75, maxD: 5.2 };
-let mode = 'explore';      // explore | lightbox | modal
+let mode = 'explore';      // explore | lightbox | modal | project
 const RES = 480;            // render height in lines
 
 function fitDistance() {
   const vf = THREE.MathUtils.degToRad(camera.fov) / 2;
   const hf = Math.atan(Math.tan(vf) * camera.aspect);
+  // phones: the fridge fills about 96% of the width, so the magnets are big enough to tap
+  if (innerWidth <= 640 && camera.aspect < 0.9) return 0.448 / Math.tan(hf) + FRONT_Z;
   // tall enough to keep Ali's feet in view, wide enough for the fridge
   return Math.max(1.12 / Math.tan(vf), 0.66 / Math.tan(hf));
 }
@@ -1097,6 +1123,7 @@ function resize() {
   const fit = fitDistance();
   rig.maxD = fit * 1.35; rig.homeD = fit;
   rig.distTo = Math.min(rig.distTo, rig.maxD);
+  reframeNote();
 }
 addEventListener('resize', resize);
 
@@ -1123,14 +1150,14 @@ canvas.addEventListener('pointerdown', e => {
 });
 canvas.addEventListener('pointermove', e => {
   if (pointers.has(e.pointerId)) pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
-  if (pinch && pointers.size === 2) {
+  if (pinch && pointers.size === 2 && mode === 'explore') {
     const [a, b] = [...pointers.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y);
     rig.distTo = THREE.MathUtils.clamp(pinch.dist * pinch.d / d, rig.minD, rig.maxD); return;
   }
   if (drag) {
     const dx = e.clientX - drag.x, dy = e.clientY - drag.y, now = performance.now();
-    if (!drag.moved && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 5) { drag.moved = true; canvas.classList.add('dragging'); setHover(-1); }
-    if (drag.moved) {
+    if (!drag.moved && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 5) { drag.moved = true; if (mode === 'explore') canvas.classList.add('dragging'); setHover(-1); }
+    if (drag.moved && mode === 'explore') {   // the camera holds still while a card is pinned
       const k = 2.6 / Math.max(innerWidth, 500) * Math.PI;
       rig.yaw += dx * k; rig.pitch = THREE.MathUtils.clamp(rig.pitch + dy * 0.004, -0.08, 0.62);
       drag.vx = drag.vx * 0.5 + (dx * k / Math.max(1, now - drag.t) * 1000) * 0.5;
@@ -1138,7 +1165,7 @@ canvas.addEventListener('pointermove', e => {
     drag.x = e.clientX; drag.y = e.clientY; drag.t = now;
     return;
   }
-  if (mode === 'explore' && e.pointerType !== 'touch') hoverAt(e.clientX, e.clientY);
+  if ((mode === 'explore' || mode === 'project') && e.pointerType !== 'touch') hoverAt(e.clientX, e.clientY);
 });
 function endPointer(e) {
   pointers.delete(e.pointerId);
@@ -1146,7 +1173,8 @@ function endPointer(e) {
   if (!drag) return;
   canvas.classList.remove('dragging');
   if (!drag.moved && mode === 'explore') clickAt(e.clientX, e.clientY);
-  else if (performance.now() - drag.t < 80) rig.yawVel = THREE.MathUtils.clamp(drag.vx, -9, 9);
+  else if (!drag.moved && mode === 'project') clickWhilePinned(e.clientX, e.clientY);
+  else if (mode === 'explore' && performance.now() - drag.t < 80) rig.yawVel = THREE.MathUtils.clamp(drag.vx, -9, 9);
   drag = null;
 }
 canvas.addEventListener('pointerup', endPointer);
@@ -1174,6 +1202,13 @@ function setHover(i, vi = -1) {
 let hoverBoard = false;
 function hoverAt(x, y) {
   const h = pick(x, y);
+  if (mode === 'project') {
+    // only the other projects' magnets react; everything else in the scene puts the card back
+    const i = h ? h.object.userData.entry : undefined;
+    setHover(phase !== 'closing' && i !== undefined && i !== current && entries[i].it.project ? i : -1);
+    $('#tip').style.transform = `translate(${Math.min(x + 16, innerWidth - 270)}px, ${y + 18}px)`;
+    return;
+  }
   hoverBoard = !!(h && (h.object === board || h.object === moreTile));
   const tip = $('#tip');
   if (h && h.object.userData.entry !== undefined) setHover(h.object.userData.entry);
@@ -1331,51 +1366,263 @@ function updateFlight(dt) {
   if (f.dir < 0 && f.t === 0) { e.group.position.copy(e.home.p); e.group.quaternion.copy(e.home.q); e.group.scale.setScalar(1); e.shadow.visible = true; flying = null; }
 }
 
-/* ------------------------------------------------------------------ project card */
-const pj = $('#project');
+/* ------------------------------------------------------------------ project note
+   The camera moves in to the door and the magnet pins an index card, with the scene still live behind it.
+   The 3D magnet hides while its card is open, and a flat sprite of the same sticker tracks its spot on screen. */
+const note = $('#note'), noteCard = $('#noteCard'), noteBack = $('#noteBack'), notePin = $('#notePin'), noteSprite = $('#noteSprite'), noteHint = $('#noteHint');
 const projectIdx = () => entries.map((e, i) => e.it.project ? i : -1).filter(i => i >= 0);
-function openProject(i) {
-  if (mode === 'modal') { $('#list').classList.remove('show'); $('#list').hidden = true; openModalEl = null; lastFocus = canvas; }
-  setHover(-1); sendHome(true);
-  current = i; currentVisitor = -1;
-  flyOut(entries[i]);
-  const wasOpen = mode === 'project';
-  mode = 'project';
-  const show = () => {
-    if (!wasOpen) showModalEl(pj);
-    fillProject(i);
-    if (!wasOpen) $('#pjClose').focus({ preventScroll: true });
+const HOME_PITCH = 0.1;
+let phase = 'idle';        // idle | opening | open | swapping | closing
+let noteGen = 0;           // bumped on every change, so timers from an older one do nothing
+let pinned = null, pinW = 158, pinH = 100;
+let hintSeen = false;
+try { hintSeen = localStorage.getItem('fridge.hintSeen') === '1'; } catch (e) {}
+const later = (ms, fn) => { const g = noteGen; setTimeout(() => { if (g === noteGen) fn(); }, ms); };
+
+function bezier(x1, y1, x2, y2) {
+  const f = (a, b, t) => 3 * a * (1 - t) * (1 - t) * t + 3 * b * (1 - t) * t * t + t * t * t;
+  return x => {
+    let lo = 0, hi = 1, t = x;
+    for (let n = 0; n < 14; n++) { if (f(x1, x2, t) < x) lo = t; else hi = t; t = (lo + hi) / 2; }
+    return f(y1, y2, t);
   };
-  if (wasOpen || reduceMotion) show(); else setTimeout(show, 260);
 }
-function fillProject(i) {
-  const it = entries[i].it, p = it.project, list = projectIdx(), k = list.indexOf(i), n = list.length;
-  const el = (tag, text) => { const x = document.createElement(tag); x.textContent = text; return x; };
-  $('#pjIcon').src = it.hi;
-  $('#pjSide').textContent = p.side === 'personal' ? 'PERSONAL PROJECT' : 'WORK'; $('#pjSide').dataset.side = p.side || 'work';
-  $('#pjTitle').textContent = it.title;
-  $('#pjRole').textContent = p.role || '';
-  $('#pjMeta').textContent = [p.dates, p.place].filter(Boolean).join(' · ');
-  $('#pjSummary').textContent = p.summary || ''; $('#pjSummary').hidden = !p.summary;
-  for (const [id, items] of [['#pjPoints', p.points], ['#pjTags', p.tags]]) {
-    const ul = $(id); ul.replaceChildren(...(items || []).map(t => el('li', t))); ul.hidden = !ul.childElementCount;
+const dollyEase = bezier(0.2, 0.8, 0.2, 1);
+let camMove = null;
+function setCam(a, b, k) {
+  rig.target.lerpVectors(a.target, b.target, k);
+  rig.dist = rig.distTo = a.dist + (b.dist - a.dist) * k;
+  rig.pitch = a.pitch + (b.pitch - a.pitch) * k;
+  rig.yaw = a.yaw + (b.yaw - a.yaw) * k;
+}
+function moveCamera(to, ms) {
+  if (!renderer) return;
+  rig.yawTo = null; rig.yawVel = 0; rig.ease = 7;
+  rig.yaw = Math.atan2(Math.sin(rig.yaw), Math.cos(rig.yaw));
+  if (!ms || reduceMotion) { camMove = null; setCam(to, to, 1); return; }
+  camMove = { start: performance.now(), ms, to, from: { target: rig.target.clone(), dist: rig.dist, pitch: rig.pitch, yaw: rig.yaw } };
+}
+function updateCamMove(now) {
+  if (!camMove) return;
+  const x = Math.min(1, Math.max(0, (now - camMove.start) / camMove.ms));
+  setCam(camMove.from, camMove.to, dollyEase(x));
+  if (x === 1) camMove = null;
+}
+const homeFrame = () => ({ target: rig.home, dist: rig.homeD, pitch: HOME_PITCH, yaw: 0 });
+
+// where the camera has to be for this magnet to land at its spot: 38% across and 20% down on desktop, centered 160px down on phones
+function landing(e) {
+  const phone = innerWidth <= 640, vw = innerWidth, vh = innerHeight, home = rig.homeD || 3.5;
+  const tv = Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2), c = Math.cos(HOME_PITCH), s = Math.sin(HOME_PITCH);
+  const widest = Math.max(...projectIdx().map(i => entries[i].it.w)) / 1000;
+  e.group.updateWorldMatrix(true, false);
+  const M = spin.worldToLocal(new THREE.Vector3().setFromMatrixPosition(e.group.matrixWorld));
+  // close enough that the widest sticker comes out at the sprite size, around 2x the default framing
+  const dist = THREE.MathUtils.clamp(widest * vh / (2 * (phone ? 130 : 158) * tv) + M.z, Math.max(rig.minD, home / (phone ? 1.6 : 2.4)), home / (phone ? 1 : 1.5));
+  const width = Math.min(520, vw - 48);
+  const x = phone ? vw / 2 : THREE.MathUtils.clamp(vw * 0.38, 24 + width / 2, vw - 24 - width / 2);
+  const y = phone ? 160 : vh * 0.2;
+  const xn = 2 * x / vw - 1, yn = 1 - 2 * y / vh, wz = M.z;
+  const wy = (yn * tv * (dist - wz * c) + wz * s) / (c + yn * tv * s);
+  const depth = dist - wy * s - wz * c;
+  const wx = xn * tv * camera.aspect * depth;
+  const ty = THREE.MathUtils.mapLinear(THREE.MathUtils.clamp(dist, rig.minD, home), rig.minD, home, 0.12, 0);
+  const spriteW = e.it.w / 1000 * vh / (2 * depth * tv), spriteH = spriteW * e.it.h / e.it.w;
+  return { target: new THREE.Vector3(M.x - wx, M.y - wy - ty, 0), dist, pitch: HOME_PITCH, yaw: 0, x, y, spriteW, spriteH, width, left: x - width / 2, top: y + spriteH * 0.1 };
+}
+function placeCard(l) {
+  note.style.setProperty('--left', l.left + 'px');
+  note.style.setProperty('--top', l.top + 'px');
+  note.style.setProperty('--width', l.width + 'px');
+  pinW = l.spriteW; pinH = l.spriteH;
+  notePin.style.width = pinW + 'px';
+  if (!renderer) placePin(l.x, l.y, 1);
+}
+function placePin(x, y, k) { notePin.style.transform = `translate(${x - pinW / 2}px,${y - pinH / 2}px) rotate(-1.2deg) scale(${k})`; }
+function reframeNote() {
+  if (mode !== 'project' || phase === 'closing' || current < 0) return;
+  const l = landing(entries[current]);
+  camMove = null; setCam(l, l, 1); placeCard(l);
+}
+
+const screenAt = new THREE.Vector3();
+function screenOf(e) {
+  e.group.updateWorldMatrix(true, false);
+  screenAt.setFromMatrixPosition(e.group.matrixWorld);
+  const depth = -screenAt.clone().applyMatrix4(camera.matrixWorldInverse).z;
+  screenAt.project(camera);
+  return { x: (screenAt.x + 1) / 2 * innerWidth, y: (1 - screenAt.y) / 2 * innerHeight, ppm: innerHeight / (2 * depth * Math.tan(THREE.MathUtils.degToRad(camera.fov) / 2)) };
+}
+// keep the sprite and the keyboard stand-ins over the magnets as the camera moves
+const proxies = new Map();
+function updateOverlays() {
+  camera.updateMatrixWorld();
+  const front = Math.cos(rig.yaw) > 0.25;
+  for (const [i, b] of proxies) {
+    const it = entries[i].it, a = screenOf(entries[i]);
+    const w = Math.max(44, it.w / 1000 * a.ppm), h = Math.max(44, it.h / 1000 * a.ppm);
+    b.style.visibility = front ? '' : 'hidden';
+    b.style.width = w + 'px'; b.style.height = h + 'px';
+    b.style.transform = `translate(${a.x - w / 2}px,${a.y - h / 2}px)`;
   }
-  $('#pjLinks').replaceChildren(...(p.links || []).map(l => { const a = el('a', l.label + ' ↗'); a.href = l.href; a.target = '_blank'; a.rel = 'noopener'; return a; }));
-  const prev = entries[list[(k - 1 + n) % n]].it.title, next = entries[list[(k + 1) % n]].it.title;
-  $('#pjPrev').textContent = '‹ ' + prev; $('#pjPrev').setAttribute('aria-label', 'Previous: ' + prev);
-  $('#pjNext').textContent = next + ' ›'; $('#pjNext').setAttribute('aria-label', 'Next: ' + next);
-  $('#pjNum').textContent = `${k + 1} / ${n}`;
-  pj.querySelector('.project').scrollTop = 0;
+  if (pinned) {
+    pinned.group.visible = false;
+    const a = screenOf(pinned);
+    placePin(a.x, a.y, pinned.it.w / 1000 * a.ppm / pinW);
+  }
+}
+function pin(e) {
+  if (pinned) pinned.group.visible = true;
+  pinned = e; e.group.visible = false;
+  noteSprite.src = e.it.hi; noteSprite.classList.remove('snap');
+  notePin.hidden = false;
+  void noteSprite.offsetWidth; noteSprite.classList.add('snap');
+}
+function unpin() {
+  if (pinned) pinned.group.visible = true;
+  pinned = null; notePin.hidden = true;
+}
+
+function fillNote(i) {
+  const it = entries[i].it, p = it.project;
+  const el = (tag, text, cls) => { const x = document.createElement(tag); x.textContent = text; if (cls) x.className = cls; return x; };
+  $('#noteChip').textContent = p.side === 'personal' ? 'PERSONAL' : 'WORK'; $('#noteChip').dataset.side = p.side || 'work';
+  $('#noteTitle').textContent = it.title;
+  const when = [p.dates, p.place].filter(Boolean).join(' · '), meta = $('#noteMeta');
+  meta.replaceChildren(...(p.role ? [el('strong', p.role)] : []), ...(p.role && when ? [el('span', ' · ', 'sep')] : []), ...(when ? [el('span', when)] : []));
+  meta.hidden = !p.role && !when;
+  $('#noteHeadline').textContent = p.headline || '';
+  const ul = $('#noteBullets'); ul.replaceChildren(...(p.bullets || []).slice(0, 3).map(t => { const li = document.createElement('li'); li.append(el('span', t)); return li; })); ul.hidden = !ul.childElementCount;
+  $('#noteStack').textContent = (p.stack || []).join(' · '); $('#noteStack').hidden = !(p.stack || []).length;
+  const links = $('#noteLinks'); links.replaceChildren(...(p.links || []).map(l => { const a = el('a', l.label + ' ↗'); a.href = l.href; a.target = '_blank'; a.rel = 'noopener'; return a; })); links.hidden = !links.childElementCount;
+  noteCard.scrollTop = 0;
+}
+function resetCardStyle() { noteCard.style.transition = noteCard.style.transform = noteCard.style.transformOrigin = noteCard.style.opacity = ''; }
+function showNote(i, l) {
+  fillNote(i); placeCard(l); pin(entries[i]);
+  resetCardStyle();
+  noteCard.className = 'note-card'; void noteCard.offsetWidth; noteCard.className = 'note-card dropping';
+  phase = 'open';
+  $('#noteTitle').focus({ preventScroll: true });
+  if (innerWidth > 640 && !hintSeen) {
+    hintSeen = true; noteHint.hidden = false;
+    try { localStorage.setItem('fridge.hintSeen', '1'); } catch (e) {}
+  }
+}
+function openProject(i, instant = false) {
+  if (mode === 'project' && (phase === 'closing' || current === i)) return;
+  if (mode === 'modal') { $('#list').classList.remove('show'); $('#list').hidden = true; openModalEl = null; lastFocus = canvas; }
+  const swapping = mode === 'project';
+  setHover(-1); sendHome(true); noteGen++;
+  mode = 'project'; current = i; currentVisitor = -1;
+  history.replaceState(null, '', '#' + entries[i].it.project.slug);
+  const l = landing(entries[i]);
+  moveCamera(l, instant ? 0 : 550);
+  if (swapping) {
+    phase = 'swapping'; resetCardStyle(); noteCard.className = 'note-card lifting';
+    later(reduceMotion ? 150 : 200, () => showNote(i, l));
+  } else {
+    phase = 'opening'; note.hidden = false; noteCard.className = 'note-card waiting';
+    if (instant || reduceMotion) showNote(i, l); else later(200, () => showNote(i, l));
+  }
 }
 function stepProject(d) { const list = projectIdx(), k = list.indexOf(current); openProject(list[(k + d + list.length) % list.length]); }
 function closeProject() {
-  if (mode !== 'project') return;
-  hideModalEl(pj); mode = 'explore'; sendHome(false);
+  if (mode !== 'project' || phase === 'closing') return;
+  noteGen++; phase = 'closing'; noteHint.hidden = true;
+  history.replaceState(null, '', location.pathname + location.search);
+  const back = proxies.get(current);
+  if (back) back.focus({ preventScroll: true }); else canvas.focus({ preventScroll: true });
+  noteCard.className = 'note-card closing';
+  later(reduceMotion ? 150 : 200, () => {
+    note.hidden = true; unpin(); resetCardStyle();
+    if (!renderer) { phase = 'idle'; mode = 'explore'; current = -1; openList(); return; }
+    moveCamera(homeFrame(), 500);
+    later(reduceMotion ? 0 : 500, () => { phase = 'idle'; mode = 'explore'; current = -1; });
+  });
 }
-$('#pjClose').addEventListener('click', closeProject);
-$('#pjPrev').addEventListener('click', () => stepProject(-1));
-$('#pjNext').addEventListener('click', () => stepProject(1));
-pj.addEventListener('click', e => { if (e.target === pj) closeProject(); });
+function clickWhilePinned(x, y) {
+  if (phase === 'closing') return;
+  const h = pick(x, y), i = h ? h.object.userData.entry : undefined;
+  if (i !== undefined && entries[i].it.project) { if (i !== current) openProject(i); }
+  else closeProject();
+}
+$('#notePut').addEventListener('click', closeProject);
+function openFromHash(instant) {
+  const slug = location.hash.slice(1);
+  const i = slug ? projectIdx().find(k => entries[k].it.project.slug === slug) : undefined;
+  if (i !== undefined) openProject(i, instant);
+  else if (!slug && mode === 'project') closeProject();
+}
+addEventListener('hashchange', () => openFromHash(false));
+if (renderer) {
+  const nav = document.createDocumentFragment();
+  for (const i of projectIdx()) {
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'magnet-btn';
+    b.setAttribute('aria-label', 'Open the card for ' + entries[i].it.title);
+    b.addEventListener('click', () => openItem(i));
+    proxies.set(i, b); nav.append(b);
+  }
+  canvas.after(nav);
+}
+
+// phones: swipe the card sideways for the next project, pull it down to put it back
+let touch = null;
+noteCard.addEventListener('touchstart', e => {
+  touch = null;
+  if (innerWidth > 640 || e.touches.length !== 1 || phase !== 'open') return;
+  const t = e.touches[0];
+  if (t.clientX < 20 || t.clientX > innerWidth - 20) return;   // leave the iOS back gesture alone
+  touch = { x: t.clientX, y: t.clientY, px: t.clientX, py: t.clientY, pt: performance.now(), dx: 0, dy: 0, vx: 0, vy: 0, axis: null, atTop: noteCard.scrollTop <= 0 };
+}, { passive: true });
+noteCard.addEventListener('touchmove', e => {
+  if (!touch) return;
+  const t = e.touches[0], now = performance.now(), dt = Math.max(1, now - touch.pt);
+  touch.dx = t.clientX - touch.x; touch.dy = t.clientY - touch.y;
+  touch.vx = (t.clientX - touch.px) / dt; touch.vy = (t.clientY - touch.py) / dt;
+  touch.px = t.clientX; touch.py = t.clientY; touch.pt = now;
+  if (!touch.axis) {
+    if (Math.hypot(touch.dx, touch.dy) < 10) { if (touch.atTop && touch.dy > 0 && e.cancelable) e.preventDefault(); return; }
+    touch.axis = Math.abs(touch.dx) > Math.abs(touch.dy) ? 'x' : 'y';
+    if (touch.axis === 'y' && !(touch.atTop && touch.dy > 0)) { touch = null; return; }   // an ordinary scroll
+    noteCard.className = 'note-card'; noteCard.style.transition = 'none';
+  }
+  if (e.cancelable) e.preventDefault();
+  noteCard.style.transform = touch.axis === 'x'
+    ? `translateX(${touch.dx}px) rotate(${-1 + touch.dx * 0.01}deg)`
+    : `translateY(${Math.max(0, touch.dy) * 0.6}px) rotate(-1deg)`;
+}, { passive: false });
+function endTouch() {
+  if (!touch) return;
+  const g = touch; touch = null;
+  if (!g.axis) return;
+  const commitX = Math.abs(g.dx) > 80 || Math.abs(g.vx) > 0.4;
+  if (g.axis === 'x' && commitX) { swipeProject(g.dx < 0 ? 1 : -1); return; }
+  if (g.axis === 'y' && (g.dy > 120 || g.vy > 0.5)) { closeProject(); return; }
+  noteCard.style.transition = 'transform .3s cubic-bezier(.34,1.56,.64,1)'; noteCard.style.transform = '';
+  later(320, () => { noteCard.style.transition = ''; });
+}
+noteCard.addEventListener('touchend', endTouch);
+noteCard.addEventListener('touchcancel', endTouch);
+function swipeProject(dir) {
+  const list = projectIdx(), i = list[(list.indexOf(current) + dir + list.length) % list.length];
+  if (reduceMotion) { openProject(i); return; }
+  noteGen++; phase = 'swapping'; current = i;
+  history.replaceState(null, '', '#' + entries[i].it.project.slug);
+  const l = landing(entries[i]);
+  moveCamera(l, 300);
+  placeCard(l); pin(entries[i]);
+  noteCard.style.transition = 'transform .26s ease-in'; noteCard.style.transformOrigin = '50% 100%';
+  noteCard.style.transform = `translateX(${-dir * 110}vw) rotate(${-dir * 8}deg)`;
+  noteBack.classList.add('forward');
+  later(300, () => {
+    fillNote(i); resetCardStyle();
+    noteBack.style.transition = 'none'; noteBack.classList.remove('forward'); void noteBack.offsetWidth; noteBack.style.transition = '';
+    noteCard.className = 'note-card'; void noteCard.offsetWidth; noteCard.className = 'note-card fading';
+    phase = 'open';
+    $('#noteTitle').focus({ preventScroll: true });
+  });
+}
 
 /* ------------------------------------------------------------------ list view */
 function openList() {
@@ -1498,6 +1745,8 @@ function frame(now) {
   const dt = Math.min(0.05, (now - last) / 1000); last = now;
   const t = now / 1000;
 
+  updateCamMove(now);
+
   // spin
   if (rig.yawTo !== null) {
     const d = rig.yawTo - rig.yaw; rig.yaw += d * (1 - Math.exp(-dt * 6));
@@ -1513,6 +1762,7 @@ function frame(now) {
   const ty = THREE.MathUtils.mapLinear(THREE.MathUtils.clamp(rig.dist, rig.minD, rig.homeD || 4), rig.minD, rig.homeD || 4, 0.12, 0);
   camera.position.set(rig.target.x, rig.target.y + ty + Math.sin(rig.pitch) * rig.dist, rig.target.z + Math.cos(rig.pitch) * rig.dist);
   camera.lookAt(rig.target.x, rig.target.y + ty, rig.target.z);
+  updateOverlays();
 
   // hover lift
   for (const e of entries) {
@@ -1546,13 +1796,15 @@ if (renderer) {
     setTimeout(() => { rig.ease = 7; }, 1800);
   } else rig.dist = rig.homeD;
   requestAnimationFrame(frame);
+  openFromHash(true);
 } else {
   // no WebGL: skip straight to the list, which works on its own
   canvas.hidden = true;
   $('#listSub').textContent = "Your browser couldn't start the 3D view, so here's everything on the fridge as a list.";
   openList();
+  openFromHash(true);
 }
-window.__fridge = { rig, entries, openItem, face, sign: () => openModal('#leave'), guestBook: openGuests, get mode() { return mode; } };
+window.__fridge = { rig, entries, openItem, face, sign: () => openModal('#leave'), guestBook: openGuests, get mode() { return mode; }, get phase() { return phase; }, get current() { return current; } };
 
 </script>
 
